@@ -1,4 +1,3 @@
-import { Student } from './student.interface';
 import express from 'express';
 import { StudentControllers } from './student.controller';
 
