@@ -12,7 +12,7 @@ const userNameSchema = new Schema<UserName>({
         type: String,
         required: [true, 'First name is required'],
         trim: true,
-        maxlength: [50, 'First name is too long'],
+        maxlength: [20, 'First name is too long'],
         validate: {
             validator: function (value: string) {
                 const firstNameStr =
