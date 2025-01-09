@@ -1,22 +1,9 @@
 import { z } from 'zod';
 
 const userNameValidationSchema = z.object({
-    firstName: z
-        .string()
-        .max(20, { message: 'First name should be less than 20 characters' })
-        .refine(
-            (value) => {
-                const firstNameStr =
-                    value.charAt(0).toUpperCase() +
-                    value.slice(1).toLowerCase();
-                return value === firstNameStr;
-            },
-            { message: 'First name is not in Capitalize format' },
-        ),
+    firstName: z.string(),
     middleName: z.string().optional(),
-    lastName: z
-        .string()
-        .max(20, { message: 'Last name should be less than 20 characters' }),
+    lastName: z.string(),
 });
 
 const guardianValidationSchema = z.object({
@@ -43,9 +30,7 @@ const StudentValidationSchema = z.object({
     email: z.string().email(),
     contactNumber: z.string(),
     emergencyContact: z.string(),
-    bloodGroup: z
-        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-        .optional(),
+    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
     presentAddress: z.string(),
     permanentAddress: z.string(),
     guardian: guardianValidationSchema,
