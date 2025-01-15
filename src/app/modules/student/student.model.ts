@@ -7,6 +7,8 @@ import {
     TStudentModel,
     TUserName,
 } from "./student.interface";
+import bcrypt from "bcrypt";
+import config from "../../config";
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
@@ -53,6 +55,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, TStudentModel>({
     id: { type: String, required: true, unique: true },
+    password: { type: String, required: true, maxlength: 20 },
     name: { type: userNameSchema, required: true },
     gender: {
         type: String,
@@ -95,6 +98,19 @@ studentSchema.statics.isUserExists = async function (id: string) {
     const existingUser = await Student.findOne({ id });
     return existingUser;
 };
+
+// mongo hooks / middlewares
+studentSchema.pre("save", async function (next) {
+    this.password = await bcrypt.hash(
+        this.password,
+        Number(config.bcrypt_salt_round),
+    );
+    next();
+});
+
+studentSchema.post("save", function () {
+    // something
+});
 
 // studentSchema.static("isUserExists", async function (id: string) {
 //     const existingUser = await Student.findOne({ id });
