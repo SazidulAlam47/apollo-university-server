@@ -1,10 +1,12 @@
-export interface UserName {
+import { Model } from "mongoose";
+
+export interface TUserName {
     firstName: string;
     middleName?: string;
     lastName: string;
 }
 
-export interface Guardian {
+export interface TGuardian {
     fatherName: string;
     fatherOccupation: string;
     fatherContact: string;
@@ -13,26 +15,37 @@ export interface Guardian {
     motherContact: string;
 }
 
-export interface LocalGuardian {
+export interface TLocalGuardian {
     name: string;
     occupation: string;
     contactNo: string;
     address: string;
 }
 
-export interface Student {
+export interface TStudent {
     id: string;
-    name: UserName;
-    gender: 'Male' | 'Female';
+    name: TUserName;
+    gender: "Male" | "Female";
     dateOfBirth: string;
     email: string;
     contactNumber: string;
     emergencyContact: string;
-    bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+    bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
     presentAddress: string;
     permanentAddress: string;
-    guardian: Guardian;
-    localGuardian: LocalGuardian;
+    guardian: TGuardian;
+    localGuardian: TLocalGuardian;
     profileImg?: string;
-    isActive: 'Active' | 'Blocked';
+    isActive: "Active" | "Blocked";
 }
+
+export type TStudentMethods = {
+    // eslint-disable-next-line no-unused-vars
+    isUserExists(id: string): Promise<TStudent | null>;
+};
+
+export type TStudentModel = Model<
+    TStudent,
+    Record<string, never>,
+    TStudentMethods
+>;

@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # any .lock files
-*.lock
+pnpm-lock.yaml

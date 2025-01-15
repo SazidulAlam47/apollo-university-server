@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 const userNameJoiSchema = Joi.object({
     firstName: Joi.string().required(),
@@ -25,27 +25,27 @@ const localGuardianJoiSchema = Joi.object({
 const StudentJoiSchema = Joi.object({
     id: Joi.string().required(),
     name: userNameJoiSchema.required(),
-    gender: Joi.string().required().valid('Male', 'Female'),
+    gender: Joi.string().required().valid("Male", "Female"),
     dateOfBirth: Joi.string().required(),
     email: Joi.string().email().required(),
     contactNumber: Joi.string().required(),
     emergencyContact: Joi.string().required(),
     bloodGroup: Joi.string().valid(
-        'A+',
-        'A-',
-        'B+',
-        'B-',
-        'AB+',
-        'AB-',
-        'O+',
-        'O-',
+        "A+",
+        "A-",
+        "B+",
+        "B-",
+        "AB+",
+        "AB-",
+        "O+",
+        "O-",
     ),
     presentAddress: Joi.string().required(),
     permanentAddress: Joi.string().required(),
     guardian: guardianJoiSchema.required(),
     localGuardian: localGuardianJoiSchema.required(),
     profileImg: Joi.string(),
-    isActive: Joi.string().valid('Active', 'Blocked').default('Active'),
+    isActive: Joi.string().valid("Active", "Blocked").default("Active"),
 });
 
 export default StudentJoiSchema;
