@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { StudentServices } from "./student.service";
-import StudentValidationSchema from "./student.validation";
+import StudentValidationSchema, {
+    LoginValidationSchema,
+} from "./student.validation";
+import { TLoginData } from "./student.interface";
 
 const createStudent = async (req: Request, res: Response) => {
     try {
@@ -53,7 +56,29 @@ const getAllStudents = async (req: Request, res: Response) => {
     }
 };
 
+const getLoginData = async (req: Request, res: Response) => {
+    try {
+        const { body } = req;
+        const loginData: TLoginData = LoginValidationSchema.parse(body);
+        const { email, password } = loginData;
+        const result = await StudentServices.getLoginDataFromDB(
+            email,
+            password,
+        );
+        res.status(200).json({
+            message: result,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong",
+            error: error,
+        });
+    }
+};
+
 export const StudentControllers = {
     createStudent,
     getAllStudents,
+    getLoginData,
 };

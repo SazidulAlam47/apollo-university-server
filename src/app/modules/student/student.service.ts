@@ -1,5 +1,6 @@
 import { TStudent } from "./student.interface";
 import { Student } from "./student.model";
+import bcrypt from "bcrypt";
 
 const createStudentIntoDB = async (studentData: TStudent) => {
     // static method
@@ -28,7 +29,22 @@ const getAllStudentsFromDB = async () => {
     return result;
 };
 
+const getLoginDataFromDB = async (email: string, password: string) => {
+    const user: TStudent | null = await Student.findOne({ email });
+    if (user) {
+        const { password: hashedPassword } = user;
+        const result = await bcrypt.compare(password, hashedPassword);
+        if (result) {
+            return "User Logged in Successfully";
+        }
+        return "Password didn't matched";
+    } else {
+        return "Email not found";
+    }
+};
+
 export const StudentServices = {
     createStudentIntoDB,
     getAllStudentsFromDB,
+    getLoginDataFromDB,
 };

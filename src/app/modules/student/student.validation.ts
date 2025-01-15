@@ -40,4 +40,9 @@ const StudentValidationSchema = z.object({
     isActive: z.enum(["Active", "Blocked"]).default("Active"),
 });
 
+export const LoginValidationSchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+});
+
 export default StudentValidationSchema;

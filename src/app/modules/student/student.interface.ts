@@ -40,6 +40,11 @@ export interface TStudent {
     isActive: "Active" | "Blocked";
 }
 
+export interface TLoginData {
+    email: string;
+    password: string;
+}
+
 // for creating static method
 export interface TStudentModel extends Model<TStudent> {
     // eslint-disable-next-line no-unused-vars
