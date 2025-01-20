@@ -35,11 +35,11 @@ const getLoginDataFromDB = async (email: string, password: string) => {
         const { password: hashedPassword } = user;
         const result = await bcrypt.compare(password, hashedPassword);
         if (result) {
-            return "User Logged in Successfully";
+            return;
         }
-        return "Password didn't matched";
+        throw new Error("Password didn't matched");
     } else {
-        return "Email not found";
+        throw new Error("Email not found");
     }
 };
 

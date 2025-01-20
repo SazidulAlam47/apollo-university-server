@@ -61,18 +61,16 @@ const getLoginData = async (req: Request, res: Response) => {
         const { body } = req;
         const loginData: TLoginData = LoginValidationSchema.parse(body);
         const { email, password } = loginData;
-        const result = await StudentServices.getLoginDataFromDB(
-            email,
-            password,
-        );
+        await StudentServices.getLoginDataFromDB(email, password);
         res.status(200).json({
-            message: result,
+            success: true,
+            message: "User Logged in Successfully",
         });
-    } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         res.status(500).json({
             success: false,
-            message: "Something went wrong",
-            error: error,
+            message: error.message as string | "Something went wrong",
         });
     }
 };
