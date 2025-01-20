@@ -38,6 +38,7 @@ export interface TStudent {
     localGuardian: TLocalGuardian;
     profileImg?: string;
     isActive: "Active" | "Blocked";
+    isDeleted: boolean;
 }
 
 export interface TLoginData {

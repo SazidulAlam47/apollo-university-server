@@ -29,6 +29,16 @@ const getAllStudentsFromDB = async () => {
     return result;
 };
 
+const getStudentByIdFromDB = async (id: string) => {
+    const result = await Student.findOne({ id });
+    return result;
+};
+
+const deleteUserFromDB = async (id: string) => {
+    const result = await Student.updateOne({ id }, { isDeleted: true });
+    return result;
+};
+
 const getLoginDataFromDB = async (email: string, password: string) => {
     const user: TStudent | null = await Student.findOne({ email });
     if (user) {
@@ -47,4 +57,6 @@ export const StudentServices = {
     createStudentIntoDB,
     getAllStudentsFromDB,
     getLoginDataFromDB,
+    getStudentByIdFromDB,
+    deleteUserFromDB,
 };

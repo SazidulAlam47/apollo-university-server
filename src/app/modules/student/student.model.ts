@@ -91,6 +91,10 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
         enum: ["Active", "Blocked"],
         default: "Active",
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 // for creating static method
@@ -98,19 +102,6 @@ studentSchema.statics.isUserExists = async function (id: string) {
     const existingUser = await Student.findOne({ id });
     return existingUser;
 };
-
-// mongo hooks / middlewares
-studentSchema.pre("save", async function (next) {
-    this.password = await bcrypt.hash(
-        this.password,
-        Number(config.bcrypt_salt_round),
-    );
-    next();
-});
-
-studentSchema.post("save", function () {
-    // something
-});
 
 // studentSchema.static("isUserExists", async function (id: string) {
 //     const existingUser = await Student.findOne({ id });
@@ -123,5 +114,39 @@ studentSchema.post("save", function () {
 //     const existingUser = await Student.findOne({ id });
 //     return existingUser;
 // };
+
+// mongo hooks / middlewares
+
+// document middlewares, this will run when calling create() or save()
+studentSchema.pre("save", async function (next) {
+    this.password = await bcrypt.hash(
+        this.password,
+        Number(config.bcrypt_salt_round),
+    );
+    next();
+});
+
+studentSchema.post("save", function (doc, next) {
+    doc.password = "";
+    next();
+});
+
+// Query Middleware,
+studentSchema.pre("find", function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
+studentSchema.pre("findOne", function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
+studentSchema.pre("aggregate", function (next) {
+    this.pipeline().unshift({
+        $match: { isDeleted: { $ne: true } },
+    });
+    next();
+});
 
 export const Student = model<TStudent, TStudentModel>("Student", studentSchema);
