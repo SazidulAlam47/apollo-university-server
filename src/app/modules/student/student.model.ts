@@ -53,48 +53,60 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
     address: { type: String, required: true },
 });
 
-const studentSchema = new Schema<TStudent, TStudentModel>({
-    id: { type: String, required: true, unique: true },
-    password: { type: String, required: true, maxlength: 20 },
-    name: { type: userNameSchema, required: true },
-    gender: {
-        type: String,
-        enum: {
-            values: ["Male", "Female"],
-            message: "{VALUE} is not valid",
+const studentSchema = new Schema<TStudent, TStudentModel>(
+    {
+        id: { type: String, required: true, unique: true },
+        password: { type: String, required: true, maxlength: 20 },
+        name: { type: userNameSchema, required: true },
+        gender: {
+            type: String,
+            enum: {
+                values: ["Male", "Female"],
+                message: "{VALUE} is not valid",
+            },
+            required: true,
         },
-        required: true,
-    },
-    dateOfBirth: { type: String, required: true },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: (value: string) => validator.isEmail(value),
-            message: "{VALUE} is not a valid email",
+        dateOfBirth: { type: String, required: true },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            validate: {
+                validator: (value: string) => validator.isEmail(value),
+                message: "{VALUE} is not a valid email",
+            },
+        },
+        contactNumber: { type: String, required: true },
+        emergencyContact: { type: String, required: true },
+        bloodGroup: {
+            type: String,
+            enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+        },
+        presentAddress: { type: String, required: true },
+        permanentAddress: { type: String, required: true },
+        guardian: { type: guardianSchema, required: true },
+        localGuardian: { type: localGuardianSchema, required: true },
+        profileImg: { type: String },
+        isActive: {
+            type: String,
+            enum: ["Active", "Blocked"],
+            default: "Active",
+        },
+        isDeleted: {
+            type: Boolean,
+            default: false,
         },
     },
-    contactNumber: { type: String, required: true },
-    emergencyContact: { type: String, required: true },
-    bloodGroup: {
-        type: String,
-        enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    {
+        toJSON: {
+            virtuals: true,
+        },
     },
-    presentAddress: { type: String, required: true },
-    permanentAddress: { type: String, required: true },
-    guardian: { type: guardianSchema, required: true },
-    localGuardian: { type: localGuardianSchema, required: true },
-    profileImg: { type: String },
-    isActive: {
-        type: String,
-        enum: ["Active", "Blocked"],
-        default: "Active",
-    },
-    isDeleted: {
-        type: Boolean,
-        default: false,
-    },
+);
+
+// virtual
+studentSchema.virtual("fullName").get(function () {
+    return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
 // for creating static method
