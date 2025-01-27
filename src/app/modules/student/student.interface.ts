@@ -25,7 +25,6 @@ export interface TLocalGuardian {
 export interface TStudent {
     id: string;
     user: Types.ObjectId;
-    password: string;
     name: TUserName;
     gender: "Male" | "Female";
     dateOfBirth: string;
@@ -38,6 +37,7 @@ export interface TStudent {
     guardian: TGuardian;
     localGuardian: TLocalGuardian;
     profileImg?: string;
+    academicDepartment: string;
     isDeleted: boolean;
 }
 
@@ -46,21 +46,7 @@ export interface TLoginData {
     password: string;
 }
 
-// for creating static method
 export interface TStudentModel extends Model<TStudent> {
     // eslint-disable-next-line no-unused-vars
     isUserExists(id: string): Promise<TStudent | null>;
 }
-
-// for creating instance method
-
-// export type TStudentMethods = {
-//     // eslint-disable-next-line no-unused-vars
-//     isUserExists(id: string): Promise<TStudent | null>;
-// };
-
-// export type TStudentModel = Model<
-//     TStudent,
-//     Record<string, never>,
-//     TStudentMethods
-// >;

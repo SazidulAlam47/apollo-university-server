@@ -6,8 +6,6 @@ import {
     TStudentModel,
     TUserName,
 } from "./student.interface";
-import bcrypt from "bcrypt";
-import config from "../../config";
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
@@ -57,7 +55,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
             unique: true,
             ref: "User",
         },
-        password: { type: String, required: true, maxlength: 20 },
         name: { type: userNameSchema, required: true },
         gender: {
             type: String,
@@ -84,6 +81,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
         guardian: { type: guardianSchema, required: true },
         localGuardian: { type: localGuardianSchema, required: true },
         profileImg: { type: String },
+        academicDepartment: { type: String, required: true },
         isDeleted: {
             type: Boolean,
             default: false,
@@ -93,6 +91,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
         toJSON: {
             virtuals: true,
         },
+        timestamps: true,
     },
 );
 
@@ -106,34 +105,6 @@ studentSchema.statics.isUserExists = async function (id: string) {
     const existingUser = await Student.findOne({ id });
     return existingUser;
 };
-
-// studentSchema.static("isUserExists", async function (id: string) {
-//     const existingUser = await Student.findOne({ id });
-//     return existingUser;
-// });
-
-// for creating instance method
-
-// studentSchema.methods.isUserExists = async function (id: string) {
-//     const existingUser = await Student.findOne({ id });
-//     return existingUser;
-// };
-
-// mongo hooks / middlewares
-
-// document middlewares, this will run when calling create() or save()
-studentSchema.pre("save", async function (next) {
-    this.password = await bcrypt.hash(
-        this.password,
-        Number(config.bcrypt_salt_round),
-    );
-    next();
-});
-
-studentSchema.post("save", function (doc, next) {
-    doc.password = "";
-    next();
-});
 
 // Query Middleware,
 studentSchema.pre("find", function (next) {
