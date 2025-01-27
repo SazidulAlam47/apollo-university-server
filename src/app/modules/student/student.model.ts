@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import validator from "validator";
 import {
     TGuardian,
     TLocalGuardian,
@@ -30,10 +29,6 @@ const userNameSchema = new Schema<TUserName>({
     lastName: {
         type: String,
         required: [true, "Last name is required"],
-        validate: {
-            validator: (value: string) => validator.isAlpha(value),
-            message: "{VALUE} is not valid",
-        },
     },
 });
 
@@ -56,6 +51,12 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 const studentSchema = new Schema<TStudent, TStudentModel>(
     {
         id: { type: String, required: true, unique: true },
+        user: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            unique: true,
+            ref: "User",
+        },
         password: { type: String, required: true, maxlength: 20 },
         name: { type: userNameSchema, required: true },
         gender: {
@@ -71,10 +72,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
             type: String,
             required: true,
             unique: true,
-            validate: {
-                validator: (value: string) => validator.isEmail(value),
-                message: "{VALUE} is not a valid email",
-            },
         },
         contactNumber: { type: String, required: true },
         emergencyContact: { type: String, required: true },
@@ -87,11 +84,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
         guardian: { type: guardianSchema, required: true },
         localGuardian: { type: localGuardianSchema, required: true },
         profileImg: { type: String },
-        isActive: {
-            type: String,
-            enum: ["Active", "Blocked"],
-            default: "Active",
-        },
         isDeleted: {
             type: Boolean,
             default: false,

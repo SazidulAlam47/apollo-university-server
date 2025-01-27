@@ -1,43 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { StudentServices } from "./student.service";
-import StudentValidationSchema, {
-    LoginValidationSchema,
-} from "./student.validation";
+import { LoginValidationSchema } from "./student.validation";
 import { TLoginData } from "./student.interface";
-
-const createStudent = async (req: Request, res: Response) => {
-    try {
-        const { student: studentData } = req.body;
-
-        // Joi validation
-        // const { error, value } = StudentJoiSchema.validate(studentData);
-        // if (error) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: 'Validation error From Joi',
-        //         error: error.details,
-        //     });
-        // }
-
-        // Zod validation
-        const zodParsedData = StudentValidationSchema.parse(studentData);
-
-        const result = await StudentServices.createStudentIntoDB(zodParsedData);
-
-        res.status(201).json({
-            success: true,
-            message: "Student created successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(500).json({
-            success: false,
-            message: error.message || "Something went wrong",
-            error: error,
-        });
-    }
-};
 
 const getAllStudents = async (req: Request, res: Response) => {
     try {
@@ -112,7 +77,6 @@ const getLoginData = async (req: Request, res: Response) => {
 };
 
 export const StudentControllers = {
-    createStudent,
     getAllStudents,
     getLoginData,
     getStudentById,
