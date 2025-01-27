@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from "express";
+import status from "http-status";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    const statusCode = 500;
-    const message = err?.message || "Something went wrong";
-
-    res.status(statusCode).json({
+    res.status(status.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message,
+        message: err?.message || "Something went wrong",
         error: err,
     });
 };
