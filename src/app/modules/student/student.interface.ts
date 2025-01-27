@@ -41,11 +41,6 @@ export interface TStudent {
     isDeleted: boolean;
 }
 
-export interface TLoginData {
-    email: string;
-    password: string;
-}
-
 export interface TStudentModel extends Model<TStudent> {
     // eslint-disable-next-line no-unused-vars
     isUserExists(id: string): Promise<TStudent | null>;

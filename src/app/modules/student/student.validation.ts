@@ -40,9 +40,4 @@ const StudentValidationSchema = z.object({
     isDeleted: z.boolean().default(false),
 });
 
-export const LoginValidationSchema = z.object({
-    email: z.string().email(),
-    password: z.string(),
-});
-
 export default StudentValidationSchema;
