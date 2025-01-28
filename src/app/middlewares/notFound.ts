@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { RequestHandler } from "express";
 import status from "http-status";
 
-const notFound = (req: Request, res: Response) => {
+const notFound: RequestHandler = (req, res) => {
     res.status(status.NOT_FOUND).json({
         success: false,
         message: "API Not Found!!",
