@@ -1,18 +1,18 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 import {
     TGuardian,
     TLocalGuardian,
     TStudent,
     TStudentModel,
     TUserName,
-} from "./student.interface";
+} from './student.interface';
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
         type: String,
-        required: [true, "First name is required"],
+        required: [true, 'First name is required'],
         trim: true,
-        maxlength: [20, "First name is too long"],
+        maxlength: [20, 'First name is too long'],
         validate: {
             validator: function (value: string) {
                 const firstNameStr =
@@ -20,13 +20,13 @@ const userNameSchema = new Schema<TUserName>({
                     value.slice(1).toLowerCase();
                 return value === firstNameStr;
             },
-            message: "{VALUE} is not in Capitalize format",
+            message: '{VALUE} is not in Capitalize format',
         },
     },
     middleName: { type: String },
     lastName: {
         type: String,
-        required: [true, "Last name is required"],
+        required: [true, 'Last name is required'],
     },
 });
 
@@ -53,18 +53,15 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
             type: Schema.Types.ObjectId,
             required: true,
             unique: true,
-            ref: "User",
+            ref: 'User',
         },
         name: { type: userNameSchema, required: true },
         gender: {
             type: String,
-            enum: {
-                values: ["Male", "Female"],
-                message: "{VALUE} is not valid",
-            },
+            enum: ['Male', 'Female'],
             required: true,
         },
-        dateOfBirth: { type: String, required: true },
+        dateOfBirth: { type: Date, required: true },
         email: {
             type: String,
             required: true,
@@ -74,7 +71,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
         emergencyContact: { type: String, required: true },
         bloodGroup: {
             type: String,
-            enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+            enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
         },
         presentAddress: { type: String, required: true },
         permanentAddress: { type: String, required: true },
@@ -96,7 +93,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
 );
 
 // virtual
-studentSchema.virtual("fullName").get(function () {
+studentSchema.virtual('fullName').get(function () {
     return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
@@ -107,21 +104,21 @@ studentSchema.statics.isUserExists = async function (id: string) {
 };
 
 // Query Middleware,
-studentSchema.pre("find", function (next) {
+studentSchema.pre('find', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 
-studentSchema.pre("findOne", function (next) {
+studentSchema.pre('findOne', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 
-studentSchema.pre("aggregate", function (next) {
+studentSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({
         $match: { isDeleted: { $ne: true } },
     });
     next();
 });
 
-export const Student = model<TStudent, TStudentModel>("Student", studentSchema);
+export const Student = model<TStudent, TStudentModel>('Student', studentSchema);

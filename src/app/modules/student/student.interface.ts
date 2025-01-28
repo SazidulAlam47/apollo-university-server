@@ -1,4 +1,4 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
 export interface TUserName {
     firstName: string;
@@ -26,12 +26,12 @@ export interface TStudent {
     id: string;
     user: Types.ObjectId;
     name: TUserName;
-    gender: "Male" | "Female";
-    dateOfBirth: string;
+    gender: 'Male' | 'Female';
+    dateOfBirth: Date;
     email: string;
     contactNumber: string;
     emergencyContact: string;
-    bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+    bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
     presentAddress: string;
     permanentAddress: string;
     guardian: TGuardian;

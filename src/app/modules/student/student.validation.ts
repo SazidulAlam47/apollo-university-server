@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const userNameValidationSchema = z.object({
     firstName: z.string(),
@@ -27,20 +27,20 @@ const createStudentValidationSchema = z.object({
         password: z.string().max(20),
         student: z.object({
             name: userNameValidationSchema,
-            gender: z.enum(["Male", "Female"]),
-            dateOfBirth: z.string(),
+            gender: z.enum(['Male', 'Female']),
+            dateOfBirth: z.date(),
             email: z.string().email(),
             contactNumber: z.string(),
             emergencyContact: z.string(),
             bloodGroup: z.enum([
-                "A+",
-                "A-",
-                "B+",
-                "B-",
-                "AB+",
-                "AB-",
-                "O+",
-                "O-",
+                'A+',
+                'A-',
+                'B+',
+                'B-',
+                'AB+',
+                'AB-',
+                'O+',
+                'O-',
             ]),
             presentAddress: z.string(),
             permanentAddress: z.string(),

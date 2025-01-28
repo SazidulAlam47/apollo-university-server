@@ -1,7 +1,7 @@
-import { UserServices } from "./user.service";
-import sendStatus from "../../utils/sendStatus";
-import status from "http-status";
-import catchAsync from "../../utils/catchAsync";
+import { UserServices } from './user.service';
+import sendStatus from '../../utils/sendStatus';
+import status from 'http-status';
+import catchAsync from '../../utils/catchAsync';
 
 const createStudent = catchAsync(async (req, res) => {
     const { password, student: studentData } = req.body;
@@ -14,7 +14,7 @@ const createStudent = catchAsync(async (req, res) => {
     sendStatus(res, {
         statusCode: status.CREATED,
         success: true,
-        message: "Student created successfully",
+        message: 'Student created successfully',
         data: result,
     });
 });

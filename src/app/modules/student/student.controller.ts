@@ -1,7 +1,7 @@
-import { StudentServices } from "./student.service";
-import sendStatus from "../../utils/sendStatus";
-import status from "http-status";
-import catchAsync from "../../utils/catchAsync";
+import { StudentServices } from './student.service';
+import sendStatus from '../../utils/sendStatus';
+import status from 'http-status';
+import catchAsync from '../../utils/catchAsync';
 
 const getAllStudents = catchAsync(async (req, res) => {
     const result = await StudentServices.getAllStudentsFromDB();
@@ -9,7 +9,7 @@ const getAllStudents = catchAsync(async (req, res) => {
     sendStatus(res, {
         statusCode: status.OK,
         success: true,
-        message: "All students fetched successfully",
+        message: 'All students fetched successfully',
         data: result,
     });
 });
