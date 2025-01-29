@@ -1,12 +1,12 @@
 import { StudentServices } from './student.service';
-import sendStatus from '../../utils/sendStatus';
+import sendResponse from '../../utils/sendResponse';
 import status from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 
 const getAllStudents = catchAsync(async (req, res) => {
     const result = await StudentServices.getAllStudentsFromDB();
 
-    sendStatus(res, {
+    sendResponse(res, {
         statusCode: status.OK,
         success: true,
         message: 'All students fetched successfully',
@@ -19,7 +19,7 @@ const getStudentById = catchAsync(async (req, res) => {
     const result = await StudentServices.getStudentByIdFromDB(studentId);
     if (!result) throw new Error(`id:${studentId} not found`);
 
-    sendStatus(res, {
+    sendResponse(res, {
         statusCode: status.OK,
         success: true,
         message: `id:${studentId} is fetched successfully`,
@@ -30,7 +30,7 @@ const getStudentById = catchAsync(async (req, res) => {
 const deleteStudent = catchAsync(async (req, res) => {
     const { studentId } = req.params;
     const result = await StudentServices.deleteUserFromDB(studentId);
-    sendStatus(res, {
+    sendResponse(res, {
         statusCode: status.OK,
         success: true,
         message: `id:${studentId} is deleted successfully`,
