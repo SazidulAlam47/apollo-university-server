@@ -1,27 +1,49 @@
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
-import { User } from './user.model';
+import { Student } from '../student/student.model';
 
-const findLastStudentId = async () => {
-    const lastStudent = await User.findOne(
+const findLastStudentId = async (year: string, code: string) => {
+    const lastStudentArray = await Student.aggregate([
         {
-            role: 'student',
+            $lookup: {
+                from: 'academicsemesters',
+                localField: 'admissionSemester',
+                foreignField: '_id',
+                as: 'admissionSemester',
+            },
         },
         {
-            id: 1,
-            _id: 0,
+            $unwind: '$admissionSemester',
         },
-    )
-        .sort({
-            createdAt: -1,
-        })
-        .lean();
+        {
+            $match: {
+                'admissionSemester.year': year,
+                'admissionSemester.code': code,
+            },
+        },
+        {
+            $project: {
+                id: 1,
+                _id: 0,
+            },
+        },
+        {
+            $sort: {
+                id: -1,
+            },
+        },
+        {
+            $limit: 1,
+        },
+    ]);
+
+    const lastStudent = lastStudentArray[0];
 
     return lastStudent?.id ? lastStudent.id.substring(6) : undefined;
 };
 
 export const generateStudentId = async (payload: TAcademicSemester) => {
-    // first time
-    const currentId: string = (await findLastStudentId()) || '0';
+    const currentId: string =
+        (await findLastStudentId(payload.year, payload.code)) || '0000';
     let incrementId: string = (Number(currentId) + 1)
         .toString()
         .padStart(4, '0');
