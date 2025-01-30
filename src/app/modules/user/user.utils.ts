@@ -21,14 +21,14 @@ const findLastStudentId = async (year: string, code: string) => {
             },
         },
         {
-            $project: {
-                id: 1,
-                _id: 0,
+            $sort: {
+                createdAt: -1,
             },
         },
         {
-            $sort: {
-                id: -1,
+            $project: {
+                id: 1,
+                _id: 0,
             },
         },
         {
