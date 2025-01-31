@@ -8,6 +8,7 @@ import {
 } from './student.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
@@ -136,6 +137,13 @@ studentSchema.pre('save', async function (next) {
     const existingUser = await Student.findOne({ id: this.id });
     if (existingUser) {
         throw new AppError(status.CONFLICT, 'Student already exists');
+    }
+
+    const academicDepartment = await AcademicSemester.findById(
+        this.academicDepartment,
+    );
+    if (!academicDepartment) {
+        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
     }
     next();
 });

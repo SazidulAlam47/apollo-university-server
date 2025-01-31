@@ -17,6 +17,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
         throw new AppError(status.NOT_FOUND, 'Admission Semester Not Found');
     }
 
+    // generate student id
     const generatedId = await generateStudentId(admissionSemester);
 
     // create a user
