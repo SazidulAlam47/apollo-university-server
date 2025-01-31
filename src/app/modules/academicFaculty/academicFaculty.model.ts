@@ -14,6 +14,24 @@ const academicFacultySchema = new Schema<TAcademicFaculty>(
     },
 );
 
+academicFacultySchema.pre('save', async function (next) {
+    const isExists = await AcademicFaculty.findOne({
+        name: this.name,
+    });
+    if (isExists) {
+        throw new Error('This Faculty is already exists');
+    }
+    next();
+});
+
+academicFacultySchema.pre('updateOne', async function (next) {
+    const isExists = await AcademicFaculty.findOne(this.getQuery());
+    if (!isExists) {
+        throw new Error("This Faculty is doesn't exists");
+    }
+    next();
+});
+
 export const AcademicFaculty = model<TAcademicFaculty>(
     'AcademicFaculty',
     academicFacultySchema,
