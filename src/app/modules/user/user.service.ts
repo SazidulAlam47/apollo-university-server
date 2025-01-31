@@ -7,6 +7,7 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
+import mongoose from 'mongoose';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const admissionSemester = await AcademicSemester.findById(
@@ -20,24 +21,45 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     // generate student id
     const generatedId = await generateStudentId(admissionSemester);
 
-    // create a user
+    // create a user data
     const userData: Partial<TUser> = {
         password: password || (config.default_password as string),
         id: generatedId,
         role: 'student',
     };
 
-    const newUser = await User.create(userData);
+    const session = await mongoose.startSession();
 
-    //create a student
-    if (Object.keys(newUser).length) {
-        payload.id = newUser.id;
-        payload.user = newUser._id;
+    try {
+        session.startTransaction();
+        // create a user (transaction-1)
+        const newUser = await User.create([userData], { session });
+
+        if (!newUser.length) {
+            throw new AppError(status.BAD_REQUEST, 'Failed to create user');
+        }
+
+        // reference and embed
+        payload.id = newUser[0].id;
+        payload.user = newUser[0]._id;
+
+        //create a student (transaction-2)
+        const newStudent = await Student.create([payload], { session });
+
+        if (!newStudent.length) {
+            throw new AppError(status.BAD_REQUEST, 'Failed to create student');
+        }
+
+        await session.commitTransaction();
+        await session.endSession();
+
+        return newStudent[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+        await session.abortTransaction();
+        await session.endSession();
+        throw new AppError(err.statusCode, err.message);
     }
-
-    const newStudent = await Student.create(payload);
-
-    return newStudent;
 };
 
 export const UserServices = {

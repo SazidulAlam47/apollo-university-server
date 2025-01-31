@@ -8,7 +8,7 @@ import {
 } from './student.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { AcademicSemester } from '../academicSemester/academicSemester.model';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
@@ -134,16 +134,28 @@ studentSchema.pre('aggregate', function (next) {
 });
 
 studentSchema.pre('save', async function (next) {
-    const existingUser = await Student.findOne({ id: this.id });
-    if (existingUser) {
+    const existingId = await Student.findOne({ id: this.id });
+    if (existingId) {
         throw new AppError(status.CONFLICT, 'Student already exists');
     }
 
-    const academicDepartment = await AcademicSemester.findById(
+    const academicDepartment = await AcademicDepartment.findById(
         this.academicDepartment,
     );
     if (!academicDepartment) {
         throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+    }
+
+    const existingEmail = await Student.findOne({ email: this.email });
+    if (existingEmail) {
+        throw new AppError(status.CONFLICT, 'Email already exists');
+    }
+
+    const existingContactNumber = await Student.findOne({
+        contactNumber: this.contactNumber,
+    });
+    if (existingContactNumber) {
+        throw new AppError(status.CONFLICT, 'Contact Number already exists');
     }
     next();
 });
