@@ -5,6 +5,8 @@ import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
+import AppError from '../../errors/AppError';
+import status from 'http-status';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const admissionSemester = await AcademicSemester.findById(
@@ -12,7 +14,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     );
 
     if (!admissionSemester) {
-        throw new Error('Admission Semester Not Found');
+        throw new AppError(status.NOT_FOUND, 'Admission Semester Not Found');
     }
 
     const generatedId = await generateStudentId(admissionSemester);

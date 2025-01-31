@@ -4,7 +4,9 @@ import { ErrorRequestHandler } from 'express';
 import status from 'http-status';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
+    const statusCode = err?.statusCode || status.INTERNAL_SERVER_ERROR;
+
+    res.status(statusCode).json({
         success: false,
         message: err?.message || 'Something went wrong',
         error: err,

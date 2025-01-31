@@ -1,10 +1,12 @@
+import status from 'http-status';
+import AppError from '../../errors/AppError';
 import { academicSemesterNameCodeMapper } from './academicSemester.constants';
 import { TAcademicSemester } from './academicSemester.interface';
 import { AcademicSemester } from './academicSemester.model';
 
 const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
     if (academicSemesterNameCodeMapper[payload.name] !== payload.code) {
-        throw new Error('Invalid semester code');
+        throw new AppError(status.CONFLICT, 'Invalid semester code');
     }
 
     const result = await AcademicSemester.create(payload);
@@ -26,14 +28,17 @@ const updateAcademicSemesterByIdFromDB = async (
     payload: TAcademicSemester,
 ) => {
     if ((payload.name && !payload.code) || (!payload.name && payload.code)) {
-        throw new Error('Name and code both should be passed');
+        throw new AppError(
+            status.CONFLICT,
+            'Name and code both should be passed',
+        );
     }
     if (
         payload.name &&
         payload.code &&
         academicSemesterNameCodeMapper[payload.name] !== payload.code
     ) {
-        throw new Error('Invalid semester code');
+        throw new AppError(status.CONFLICT, 'Invalid semester code');
     }
     const result = await AcademicSemester.updateOne({ _id: id }, payload, {
         new: true,

@@ -6,6 +6,8 @@ import {
     TStudentModel,
     TUserName,
 } from './student.interface';
+import AppError from '../../errors/AppError';
+import status from 'http-status';
 
 const userNameSchema = new Schema<TUserName>({
     firstName: {
@@ -127,6 +129,14 @@ studentSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({
         $match: { isDeleted: { $ne: true } },
     });
+    next();
+});
+
+studentSchema.pre('save', async function (next) {
+    const existingUser = await Student.findOne({ id: this.id });
+    if (existingUser) {
+        throw new AppError(status.CONFLICT, 'Student already exists');
+    }
     next();
 });
 
