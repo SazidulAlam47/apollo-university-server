@@ -18,8 +18,7 @@ const getAllStudents = catchAsync(async (req, res) => {
 const getStudentById = catchAsync(async (req, res) => {
     const { studentId } = req.params;
     const result = await StudentServices.getStudentByIdFromDB(studentId);
-    if (!result)
-        throw new AppError(status.NOT_FOUND, `id:${studentId} not found`);
+    if (!result) throw new AppError(status.NOT_FOUND, 'Student not found');
 
     sendResponse(res, {
         statusCode: status.OK,

@@ -2,6 +2,7 @@ import status from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { AcademicDepartmentServices } from './academicDepartment.service';
+import AppError from '../../errors/AppError';
 
 const createAcademicDepartment = catchAsync(async (req, res) => {
     const result =
@@ -32,6 +33,8 @@ const getAcademicDepartmentById = catchAsync(async (req, res) => {
         await AcademicDepartmentServices.getAcademicDepartmentByIdFromDB(
             req.params.id,
         );
+    if (!result)
+        throw new AppError(status.NOT_FOUND, 'Academic Department not found');
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
