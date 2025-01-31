@@ -40,9 +40,13 @@ const updateAcademicSemesterByIdFromDB = async (
     ) {
         throw new AppError(status.CONFLICT, 'Invalid semester code');
     }
-    const result = await AcademicSemester.updateOne({ _id: id }, payload, {
-        new: true,
-    });
+    const result = await AcademicSemester.findOneAndUpdate(
+        { _id: id },
+        payload,
+        {
+            new: true,
+        },
+    );
     return result;
 };
 

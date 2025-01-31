@@ -10,7 +10,7 @@ const getAllStudents = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: 'All students fetched successfully',
+        message: 'All students are fetched successfully',
         data: result,
     });
 });
@@ -23,7 +23,7 @@ const getStudentById = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: `id:${studentId} is fetched successfully`,
+        message: 'Student is fetched successfully',
         data: result,
     });
 });
@@ -34,7 +34,7 @@ const deleteStudent = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: `id:${studentId} is deleted successfully`,
+        message: 'Student is deleted successfully',
         data: result,
     });
 });

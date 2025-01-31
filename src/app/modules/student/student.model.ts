@@ -126,6 +126,11 @@ studentSchema.pre('findOne', function (next) {
     next();
 });
 
+studentSchema.pre('findOneAndUpdate', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
 studentSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({
         $match: { isDeleted: { $ne: true } },

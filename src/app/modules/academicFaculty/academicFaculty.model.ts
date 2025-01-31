@@ -26,7 +26,7 @@ academicFacultySchema.pre('save', async function (next) {
     next();
 });
 
-academicFacultySchema.pre('updateOne', async function (next) {
+academicFacultySchema.pre('findOneAndUpdate', async function (next) {
     const isExists = await AcademicFaculty.findOne(this.getQuery());
     if (!isExists) {
         throw new AppError(status.NOT_FOUND, "This Faculty is doesn't exists");

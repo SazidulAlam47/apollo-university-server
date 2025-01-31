@@ -20,9 +20,13 @@ const updateAcademicFacultyByIdFromDB = async (
     id: string,
     payload: TAcademicFaculty,
 ) => {
-    const result = await AcademicFaculty.updateOne({ _id: id }, payload, {
-        new: true,
-    });
+    const result = await AcademicFaculty.findOneAndUpdate(
+        { _id: id },
+        payload,
+        {
+            new: true,
+        },
+    );
     return result;
 };
 
