@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from 'express';
 import status from 'http-status';
 import { ZodError } from 'zod';
@@ -8,9 +6,11 @@ import handleZodError from '../errors/handleZodError';
 import config from '../config';
 import handleValidationError from '../errors/handleValidationError';
 import handleCastError from '../errors/handleCastError';
-import handleDuplicateError from '../errors/handleDuplicateError';
-import AppError from '../errors/AppError';
+import handleDuplicateError, {
+    duplicateErrorRegex,
+} from '../errors/handleDuplicateError';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     let statusCode: number = err?.statusCode || status.INTERNAL_SERVER_ERROR;
     let message: string = err?.message || 'Something went wrong';
@@ -21,6 +21,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         },
     ];
 
+    let match: RegExpMatchArray | undefined;
     let simplifiedError: TGenericErrorResponse | undefined = undefined;
 
     if (err instanceof ZodError) {
@@ -29,8 +30,8 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         simplifiedError = handleValidationError(err);
     } else if (err?.name === 'CastError') {
         simplifiedError = handleCastError(err);
-    } else if (err?.code === 11000) {
-        simplifiedError = handleDuplicateError(err);
+    } else if ((match = err?.message.match(duplicateErrorRegex))) {
+        simplifiedError = handleDuplicateError(match);
     }
 
     if (simplifiedError) {
