@@ -3,10 +3,12 @@
 import { ErrorRequestHandler } from 'express';
 import status from 'http-status';
 import { ZodError } from 'zod';
-import { TErrorSources } from '../interface/error';
+import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 import handleZodError from '../errors/handleZodError';
 import config from '../config';
 import handleValidationError from '../errors/handleValidationError';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicateError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     let statusCode = err?.statusCode || status.INTERNAL_SERVER_ERROR;
@@ -18,16 +20,22 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         },
     ];
 
+    let simplifiedError: TGenericErrorResponse | undefined = undefined;
+
     if (err instanceof ZodError) {
-        const simplifiedError = handleZodError(err);
-        statusCode = simplifiedError.statusCode;
-        message = simplifiedError.message;
-        errorSources = simplifiedError.errorSources;
+        simplifiedError = handleZodError(err);
     } else if (err?.name === 'ValidationError') {
-        const simplifiedError = handleValidationError(err);
-        statusCode = simplifiedError.statusCode;
-        message = simplifiedError.message;
-        errorSources = simplifiedError.errorSources;
+        simplifiedError = handleValidationError(err);
+    } else if (err?.name === 'CastError') {
+        simplifiedError = handleCastError(err);
+    } else if (err?.code === 11000) {
+        simplifiedError = handleDuplicateError(err);
+    }
+
+    if (simplifiedError) {
+        statusCode = simplifiedError?.statusCode;
+        message = simplifiedError?.message;
+        errorSources = simplifiedError?.errorSources;
     }
 
     res.status(statusCode).json({
@@ -35,7 +43,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         message,
         errorSources,
         stack: config.NODE_ENV === 'development' ? err?.stack : undefined,
-        //err,
+        err,
     });
 };
 

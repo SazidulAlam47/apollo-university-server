@@ -1,8 +1,8 @@
 import status from 'http-status';
 import { ZodError, ZodIssue } from 'zod';
-import { TErrorSources } from '../interface/error';
+import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
-const handleZodError = (err: ZodError) => {
+const handleZodError = (err: ZodError): TGenericErrorResponse => {
     const statusCode = status.BAD_REQUEST;
     const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => {
         return {
