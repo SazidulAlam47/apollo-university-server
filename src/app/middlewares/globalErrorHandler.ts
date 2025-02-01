@@ -17,7 +17,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     let errorSources: TErrorSources = [
         {
             path: '',
-            message: 'Something went wrong',
+            message: err?.message || 'Something went wrong',
         },
     ];
 
@@ -31,13 +31,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         simplifiedError = handleCastError(err);
     } else if (err?.code === 11000) {
         simplifiedError = handleDuplicateError(err);
-    } else if (err instanceof AppError || err instanceof Error) {
-        errorSources = [
-            {
-                path: '',
-                message: err?.message,
-            },
-        ];
     }
 
     if (simplifiedError) {
