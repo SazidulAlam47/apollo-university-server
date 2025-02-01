@@ -66,25 +66,18 @@ const deleteUserFromDB = async (id: string) => {
 };
 
 const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
-    const { name, guardian, localGuardian, ...remainingData } = payload;
+    const { name, guardian, localGuardian, ...primitiveData } = payload;
 
-    const modifiedData: Record<string, unknown> = { ...remainingData };
+    const modifiedData: Record<string, unknown> = primitiveData;
+    const nonPrimitiveData = { name, guardian, localGuardian };
 
-    if (name && Object.keys(name).length) {
-        for (const [key, value] of Object.entries(name)) {
-            modifiedData[`name.${key}`] = value;
+    Object.entries(nonPrimitiveData).forEach(([field, data]) => {
+        if (data && Object.keys(data).length) {
+            Object.entries(data).forEach(([key, value]) => {
+                modifiedData[`${field}.${key}`] = value;
+            });
         }
-    }
-    if (guardian && Object.keys(guardian).length) {
-        for (const [key, value] of Object.entries(guardian)) {
-            modifiedData[`guardian.${key}`] = value;
-        }
-    }
-    if (localGuardian && Object.keys(localGuardian).length) {
-        for (const [key, value] of Object.entries(localGuardian)) {
-            modifiedData[`localGuardian.${key}`] = value;
-        }
-    }
+    });
 
     const result = await Student.findOneAndUpdate({ id }, modifiedData, {
         new: true,
