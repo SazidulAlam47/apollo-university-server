@@ -9,10 +9,11 @@ import config from '../config';
 import handleValidationError from '../errors/handleValidationError';
 import handleCastError from '../errors/handleCastError';
 import handleDuplicateError from '../errors/handleDuplicateError';
+import AppError from '../errors/AppError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    let statusCode = err?.statusCode || status.INTERNAL_SERVER_ERROR;
-    let message = err?.message || 'Something went wrong';
+    let statusCode: number = err?.statusCode || status.INTERNAL_SERVER_ERROR;
+    let message: string = err?.message || 'Something went wrong';
     let errorSources: TErrorSources = [
         {
             path: '',
@@ -30,6 +31,13 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         simplifiedError = handleCastError(err);
     } else if (err?.code === 11000) {
         simplifiedError = handleDuplicateError(err);
+    } else if (err instanceof AppError || err instanceof Error) {
+        errorSources = [
+            {
+                path: '',
+                message: err?.message,
+            },
+        ];
     }
 
     if (simplifiedError) {
@@ -43,7 +51,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         message,
         errorSources,
         stack: config.NODE_ENV === 'development' ? err?.stack : undefined,
-        err,
     });
 };
 
