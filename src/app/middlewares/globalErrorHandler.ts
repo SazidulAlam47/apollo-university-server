@@ -22,7 +22,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     ];
 
     let match: RegExpMatchArray | undefined;
-    let simplifiedError: TGenericErrorResponse | undefined = undefined;
+    let simplifiedError: TGenericErrorResponse | undefined;
 
     if (err instanceof ZodError) {
         simplifiedError = handleZodError(err);
