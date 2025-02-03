@@ -6,10 +6,6 @@ import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-    const searchableFields = ['email', 'name.firstName'];
-    const searchTerm = query?.searchTerm || '';
-    const queryObj = { ...query }; //copy
-
     // default
     const populateStudents = Student.find()
         .populate('admissionSemester')
@@ -21,6 +17,8 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
         });
 
     // search
+    const searchableFields: Array<string> = ['email', 'name.firstName'];
+    const searchTerm: string = (query?.searchTerm as string) || '';
     const searchQuery = populateStudents.find({
         $or: searchableFields.map((field) => ({
             [field]: { $regex: searchTerm, $options: 'i' },
@@ -28,20 +26,35 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     });
 
     // filter
-    const excludeFields = ['searchTerm', 'sort', 'limit'];
+    const queryObj: Record<string, unknown> = { ...query }; //copy
+    const excludeFields: Array<string> = [
+        'searchTerm',
+        'sort',
+        'limit',
+        'page',
+        'fields',
+    ];
     excludeFields.forEach((el) => delete queryObj[el]);
     const filterStudents = searchQuery.find(queryObj);
+    // console.log({ query, queryObj });
 
     // sort
-    const sort: string = (query.sort as string) || '-createdAt';
+    const sort: string = (query?.sort as string) || '-createdAt';
     const sortStudents = filterStudents.sort(sort);
 
-    // limit
-    const limit: number = parseInt(query.limit as string) || 0;
+    // page and limit
+    const page: number = parseInt(query?.page as string) || 0;
+    const limit: number = parseInt(query?.limit as string) || 0;
+    const paginationStudents = sortStudents
+        .skip((page - 1) * limit)
+        .limit(limit);
 
-    const limitStudents = await sortStudents.limit(limit);
+    const fields: string = (query?.fields as string) || '-__v';
+    const fieldsWithSpace: string = fields.split(',').join(' ');
 
-    return limitStudents;
+    const fieldsStudents = await paginationStudents.select(fieldsWithSpace);
+
+    return fieldsStudents;
 };
 
 const getStudentByIdFromDB = async (id: string) => {
