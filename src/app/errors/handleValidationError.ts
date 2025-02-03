@@ -8,12 +8,10 @@ const handleValidationError = (
     const statusCode = status.BAD_REQUEST;
 
     const errorSources: TErrorSources = Object.values(err.errors).map(
-        (value: mongoose.Error.ValidatorError | mongoose.Error.CastError) => {
-            return {
-                path: value?.path,
-                message: value?.message,
-            };
-        },
+        (value: mongoose.Error.ValidatorError | mongoose.Error.CastError) => ({
+            path: value?.path,
+            message: value?.message,
+        }),
     );
 
     return {

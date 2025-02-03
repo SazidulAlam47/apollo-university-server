@@ -4,12 +4,10 @@ import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
 const handleZodError = (err: ZodError): TGenericErrorResponse => {
     const statusCode = status.BAD_REQUEST;
-    const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => {
-        return {
-            path: issue.path[issue.path.length - 1],
-            message: issue.message,
-        };
-    });
+    const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => ({
+        path: issue.path[issue.path.length - 1],
+        message: issue.message,
+    }));
 
     return {
         statusCode,
