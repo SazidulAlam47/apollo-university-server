@@ -4,6 +4,7 @@ import { TUserName } from '../user/user.interface';
 export interface TAdmin {
     id: string;
     user: Types.ObjectId;
+    designation: string;
     name: TUserName;
     gender: 'Male' | 'Female';
     dateOfBirth: Date;

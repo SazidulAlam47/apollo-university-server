@@ -1,4 +1,4 @@
-export const studentSearchableFields: Array<string> = [
+export const adminSearchableFields = [
     'name.firstName',
     'name.lastName',
     'email',

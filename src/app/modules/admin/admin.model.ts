@@ -8,6 +8,7 @@ const adminSchema = new Schema(
     {
         id: { type: String },
         user: { type: Schema.Types.ObjectId, require: true },
+        designation: { type: String, require: true },
         name: { type: userNameSchema, require: true },
         gender: {
             type: String,
