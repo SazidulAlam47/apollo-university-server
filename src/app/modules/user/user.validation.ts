@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const createUserNameValidationSchema = z.object({
     firstName: z.string(),
     middleName: z.string().optional(),

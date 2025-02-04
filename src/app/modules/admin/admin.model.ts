@@ -1,6 +1,8 @@
 import { model, Schema } from 'mongoose';
 import { userNameSchema } from '../user/user.model';
 import { TAdmin } from './admin.interface';
+import AppError from '../../errors/AppError';
+import status from 'http-status';
 
 const adminSchema = new Schema(
     {
@@ -35,5 +37,48 @@ const adminSchema = new Schema(
         timestamps: true,
     },
 );
+
+// Query Middleware,
+adminSchema.pre('find', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
+adminSchema.pre('findOne', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
+adminSchema.pre('findOneAndUpdate', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+
+adminSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({
+        $match: { isDeleted: { $ne: true } },
+    });
+    next();
+});
+
+adminSchema.pre('save', async function (next) {
+    const existingId = await Admin.findOne({ id: this.id });
+    if (existingId) {
+        throw new AppError(status.CONFLICT, 'Admin already exists');
+    }
+
+    const existingEmail = await Admin.findOne({ email: this.email });
+    if (existingEmail) {
+        throw new AppError(status.CONFLICT, 'Email already exists');
+    }
+
+    const existingContactNumber = await Admin.findOne({
+        contactNumber: this.contactNumber,
+    });
+    if (existingContactNumber) {
+        throw new AppError(status.CONFLICT, 'Contact Number already exists');
+    }
+    next();
+});
 
 export const Admin = model<TAdmin>('Admin', adminSchema);

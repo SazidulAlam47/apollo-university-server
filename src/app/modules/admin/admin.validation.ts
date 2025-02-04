@@ -8,7 +8,6 @@ const createAdminValidationSchema = z.object({
     body: z.object({
         password: z.string(),
         admin: z.object({
-            user: z.string(),
             name: createUserNameValidationSchema,
             gender: z.enum(['Male', 'Female']),
             dateOfBirth: z.string(),
@@ -28,7 +27,6 @@ const updateAdminValidationSchema = z.object({
     body: z.object({
         password: z.string().optional(),
         admin: z.object({
-            user: z.string().optional(),
             name: updateUserNameValidationSchema.optional(),
             gender: z.enum(['Male', 'Female']).optional(),
             dateOfBirth: z.string().optional(),

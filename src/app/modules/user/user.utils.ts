@@ -1,5 +1,6 @@
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
 import { Student } from '../student/student.model';
+import { User } from './user.model';
 
 const findLastStudentId = async (year: string, code: string) => {
     const lastStudentArray = await Student.aggregate([
@@ -48,5 +49,20 @@ export const generateStudentId = async (payload: TAcademicSemester) => {
         .toString()
         .padStart(4, '0');
     incrementId = payload.year + payload.code + incrementId;
+    return incrementId;
+};
+
+const findLastOfficialId = async (role: string) => {
+    const lastUser = await User.findOne({ role })
+        .sort({ createdAt: -1 })
+        .lean();
+    return lastUser?.id;
+};
+
+export const generateOfficialId = async (role: string) => {
+    const currentId: string = (await findLastOfficialId(role)) || '0000';
+    const incrementId: string = (Number(currentId) + 1)
+        .toString()
+        .padStart(4, '0');
     return incrementId;
 };
