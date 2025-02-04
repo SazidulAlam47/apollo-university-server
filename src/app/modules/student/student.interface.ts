@@ -1,11 +1,5 @@
 import { Model, Types } from 'mongoose';
-
-export interface TUserName {
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-}
-
+import { TUserName } from '../user/user.interface';
 export interface TGuardian {
     fatherName: string;
     fatherOccupation: string;

@@ -4,34 +4,11 @@ import {
     TLocalGuardian,
     TStudent,
     TStudentModel,
-    TUserName,
 } from './student.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
-
-const userNameSchema = new Schema<TUserName>({
-    firstName: {
-        type: String,
-        required: [true, 'First name is required'],
-        trim: true,
-        maxlength: [20, 'First name is too long'],
-        validate: {
-            validator: function (value: string) {
-                const firstNameStr =
-                    value.charAt(0).toUpperCase() +
-                    value.slice(1).toLowerCase();
-                return value === firstNameStr;
-            },
-            message: '{VALUE} is not in Capitalize format',
-        },
-    },
-    middleName: { type: String },
-    lastName: {
-        type: String,
-        required: [true, 'Last name is required'],
-    },
-});
+import { userNameSchema } from '../user/user.model';
 
 const guardianSchema = new Schema<TGuardian>({
     fatherName: { type: String, required: true },

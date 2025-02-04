@@ -1,16 +1,8 @@
 import { z } from 'zod';
-
-const createUserNameValidationSchema = z.object({
-    firstName: z.string(),
-    middleName: z.string().optional(),
-    lastName: z.string(),
-});
-
-const updateUserNameValidationSchema = z.object({
-    firstName: z.string().optional(),
-    middleName: z.string().optional().optional(),
-    lastName: z.string().optional(),
-});
+import {
+    createUserNameValidationSchema,
+    updateUserNameValidationSchema,
+} from '../user/user.validation';
 
 const createGuardianValidationSchema = z.object({
     fatherName: z.string(),

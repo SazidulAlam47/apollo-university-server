@@ -1,7 +1,19 @@
 import { model, Schema } from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, TUserName } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+
+export const userNameSchema = new Schema<TUserName>({
+    firstName: {
+        type: String,
+        required: true,
+    },
+    middleName: { type: String },
+    lastName: {
+        type: String,
+        required: true,
+    },
+});
 
 const userSchema = new Schema<TUser>(
     {
