@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import { TAcademicDepartment } from './academicDepartment.interface';
 import { AcademicDepartment } from './academicDepartment.model';
 
@@ -6,8 +7,23 @@ const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
     return result;
 };
 
-const getAllAcademicDepartmentFromDB = async () => {
-    const result = await AcademicDepartment.find().populate('academicFaculty');
+const getAllAcademicDepartmentFromDB = async (
+    query: Record<string, unknown>,
+) => {
+    const academicDepartmentPopulate =
+        AcademicDepartment.find().populate('academicFaculty');
+
+    const academicDepartmentQuery = new QueryBuilder(
+        academicDepartmentPopulate,
+        query,
+    )
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await academicDepartmentQuery.modelQuery;
+
     return result;
 };
 
