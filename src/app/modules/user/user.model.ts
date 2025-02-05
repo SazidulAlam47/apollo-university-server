@@ -3,17 +3,22 @@ import { TUser, TUserName } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 
-export const userNameSchema = new Schema<TUserName>({
-    firstName: {
-        type: String,
-        required: true,
+export const userNameSchema = new Schema<TUserName>(
+    {
+        firstName: {
+            type: String,
+            required: true,
+        },
+        middleName: { type: String },
+        lastName: {
+            type: String,
+            required: true,
+        },
     },
-    middleName: { type: String },
-    lastName: {
-        type: String,
-        required: true,
+    {
+        _id: false,
     },
-});
+);
 
 const userSchema = new Schema<TUser>(
     {

@@ -10,21 +10,31 @@ import status from 'http-status';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { userNameSchema } from '../user/user.model';
 
-const guardianSchema = new Schema<TGuardian>({
-    fatherName: { type: String, required: true },
-    fatherOccupation: { type: String, required: true },
-    fatherContact: { type: String, required: true },
-    motherName: { type: String, required: true },
-    motherOccupation: { type: String, required: true },
-    motherContact: { type: String, required: true },
-});
+const guardianSchema = new Schema<TGuardian>(
+    {
+        fatherName: { type: String, required: true },
+        fatherOccupation: { type: String, required: true },
+        fatherContact: { type: String, required: true },
+        motherName: { type: String, required: true },
+        motherOccupation: { type: String, required: true },
+        motherContact: { type: String, required: true },
+    },
+    {
+        _id: false,
+    },
+);
 
-const localGuardianSchema = new Schema<TLocalGuardian>({
-    name: { type: String, required: true },
-    occupation: { type: String, required: true },
-    contactNo: { type: String, required: true },
-    address: { type: String, required: true },
-});
+const localGuardianSchema = new Schema<TLocalGuardian>(
+    {
+        name: { type: String, required: true },
+        occupation: { type: String, required: true },
+        contactNo: { type: String, required: true },
+        address: { type: String, required: true },
+    },
+    {
+        _id: false,
+    },
+);
 
 const studentSchema = new Schema<TStudent, TStudentModel>(
     {
