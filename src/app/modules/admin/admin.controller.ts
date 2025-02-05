@@ -15,8 +15,8 @@ const getAllAdmin = catchAsync(async (req, res) => {
 });
 
 const getAdminById = catchAsync(async (req, res) => {
-    const { adminId } = req.params;
-    const result = await AdminServices.getAdminByIdIntoDB(adminId);
+    const { id } = req.params;
+    const result = await AdminServices.getAdminByIdIntoDB(id);
     if (!result) throw new AppError(status.NOT_FOUND, 'Admin not found');
 
     sendResponse(res, {
@@ -28,9 +28,9 @@ const getAdminById = catchAsync(async (req, res) => {
 });
 
 const updateAdminById = catchAsync(async (req, res) => {
-    const { adminId } = req.params;
+    const { id } = req.params;
     const { admin } = req.body;
-    const result = await AdminServices.updateAdminByIdIntoDB(adminId, admin);
+    const result = await AdminServices.updateAdminByIdIntoDB(id, admin);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -40,8 +40,8 @@ const updateAdminById = catchAsync(async (req, res) => {
 });
 
 const deleteAdminById = catchAsync(async (req, res) => {
-    const { adminId } = req.params;
-    const result = await AdminServices.deleteAdminFromDB(adminId);
+    const { id } = req.params;
+    const result = await AdminServices.deleteAdminFromDB(id);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

@@ -6,14 +6,14 @@ import validateRequest from '../../middlewares/validateRequest';
 const router = express.Router();
 
 router.get('/', FacultyControllers.getAllFaculty);
-router.get('/:facultyId', FacultyControllers.getFacultyById);
+router.get('/:id', FacultyControllers.getFacultyById);
 
 router.patch(
-    '/:facultyId',
+    '/:id',
     validateRequest(FacultyValidations.updateFacultyValidationSchema),
     FacultyControllers.updateFacultyById,
 );
 
-router.delete('/:facultyId', FacultyControllers.deleteFacultyById);
+router.delete('/:id', FacultyControllers.deleteFacultyById);
 
 export const FacultyRouters = router;

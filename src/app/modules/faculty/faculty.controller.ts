@@ -15,8 +15,8 @@ const getAllFaculty = catchAsync(async (req, res) => {
 });
 
 const getFacultyById = catchAsync(async (req, res) => {
-    const { facultyId } = req.params;
-    const result = await FacultyServices.getFacultyByIdIntoDB(facultyId);
+    const { id } = req.params;
+    const result = await FacultyServices.getFacultyByIdIntoDB(id);
     if (!result) throw new AppError(status.NOT_FOUND, 'Faculty not found');
 
     sendResponse(res, {
@@ -28,12 +28,9 @@ const getFacultyById = catchAsync(async (req, res) => {
 });
 
 const updateFacultyById = catchAsync(async (req, res) => {
-    const { facultyId } = req.params;
+    const { id } = req.params;
     const { faculty } = req.body;
-    const result = await FacultyServices.updateFacultyByIdIntoDB(
-        facultyId,
-        faculty,
-    );
+    const result = await FacultyServices.updateFacultyByIdIntoDB(id, faculty);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -43,8 +40,8 @@ const updateFacultyById = catchAsync(async (req, res) => {
 });
 
 const deleteFacultyById = catchAsync(async (req, res) => {
-    const { facultyId } = req.params;
-    const result = await FacultyServices.deleteFacultyFromDB(facultyId);
+    const { id } = req.params;
+    const result = await FacultyServices.deleteFacultyFromDB(id);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

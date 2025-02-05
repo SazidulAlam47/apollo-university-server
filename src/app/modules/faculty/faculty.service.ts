@@ -21,7 +21,7 @@ const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getFacultyByIdIntoDB = async (id: string) => {
-    const result = await Faculty.findOne({ id });
+    const result = await Faculty.findById(id);
     return result;
 };
 
@@ -39,7 +39,7 @@ const updateFacultyByIdIntoDB = async (id: string, payload: TFaculty) => {
         }
     });
 
-    const result = await Faculty.findOneAndUpdate({ id }, modifiedData, {
+    const result = await Faculty.findByIdAndUpdate(id, modifiedData, {
         new: true,
         runValidators: true,
     });
@@ -50,8 +50,8 @@ const deleteFacultyFromDB = async (id: string) => {
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
-        const deletedFaculty = await Faculty.findOneAndUpdate(
-            { id },
+        const deletedFaculty = await Faculty.findByIdAndUpdate(
+            id,
             { isDeleted: true },
             { new: true, session },
         );
@@ -60,8 +60,10 @@ const deleteFacultyFromDB = async (id: string) => {
             throw new AppError(status.NOT_FOUND, 'Faculty not found');
         }
 
-        const deletedUser = await User.findOneAndUpdate(
-            { role: 'faculty', id },
+        const userId = deletedFaculty.user;
+
+        const deletedUser = await User.findByIdAndUpdate(
+            userId,
             { isDeleted: true },
             { new: true, session },
         );

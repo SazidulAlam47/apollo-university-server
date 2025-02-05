@@ -21,7 +21,7 @@ const getAllAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getAdminByIdIntoDB = async (id: string) => {
-    const result = await Admin.findOne({ id });
+    const result = await Admin.findById(id);
     return result;
 };
 
@@ -39,7 +39,7 @@ const updateAdminByIdIntoDB = async (id: string, payload: TAdmin) => {
         }
     });
 
-    const result = await Admin.findOneAndUpdate({ id }, modifiedData, {
+    const result = await Admin.findByIdAndUpdate(id, modifiedData, {
         new: true,
         runValidators: true,
     });
@@ -50,8 +50,8 @@ const deleteAdminFromDB = async (id: string) => {
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
-        const deletedAdmin = await Admin.findOneAndUpdate(
-            { id },
+        const deletedAdmin = await Admin.findByIdAndUpdate(
+            id,
             { isDeleted: true },
             { new: true, session },
         );
@@ -60,8 +60,10 @@ const deleteAdminFromDB = async (id: string) => {
             throw new AppError(status.NOT_FOUND, 'Admin not found');
         }
 
-        const deletedUser = await User.findOneAndUpdate(
-            { role: 'admin', id },
+        const userId = deletedAdmin.user;
+
+        const deletedUser = await User.findByIdAndUpdate(
+            userId,
             { isDeleted: true },
             { new: true, session },
         );

@@ -31,11 +31,11 @@ const moduleRoutes = [
         route: AcademicDepartmentRouters,
     },
     {
-        path: '/admin',
+        path: '/admins',
         route: AdminRouters,
     },
     {
-        path: '/faculty',
+        path: '/faculties',
         route: FacultyRouters,
     },
 ];

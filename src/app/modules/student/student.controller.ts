@@ -16,8 +16,8 @@ const getAllStudents = catchAsync(async (req, res) => {
 });
 
 const getStudentById = catchAsync(async (req, res) => {
-    const { studentId } = req.params;
-    const result = await StudentServices.getStudentByIdFromDB(studentId);
+    const { id } = req.params;
+    const result = await StudentServices.getStudentByIdFromDB(id);
     if (!result) throw new AppError(status.NOT_FOUND, 'Student not found');
 
     sendResponse(res, {
@@ -29,8 +29,8 @@ const getStudentById = catchAsync(async (req, res) => {
 });
 
 const deleteStudent = catchAsync(async (req, res) => {
-    const { studentId } = req.params;
-    const result = await StudentServices.deleteUserFromDB(studentId);
+    const { id } = req.params;
+    const result = await StudentServices.deleteUserFromDB(id);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -40,12 +40,9 @@ const deleteStudent = catchAsync(async (req, res) => {
 });
 
 const updateStudent = catchAsync(async (req, res) => {
-    const { studentId } = req.params;
+    const { id } = req.params;
     const { student } = req.body;
-    const result = await StudentServices.updateStudentIntoDB(
-        studentId,
-        student,
-    );
+    const result = await StudentServices.updateStudentIntoDB(id, student);
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
