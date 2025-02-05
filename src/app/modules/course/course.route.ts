@@ -14,6 +14,12 @@ router.post(
     CourseControllers.createCourse,
 );
 
+router.patch(
+    '/:id',
+    validateRequest(CourseValidations.updateCourseValidationSchema),
+    CourseControllers.updateCourse,
+);
+
 router.delete('/:id', CourseControllers.deleteCourse);
 
 export const CourseRouters = router;
