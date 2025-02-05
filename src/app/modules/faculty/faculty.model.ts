@@ -1,10 +1,11 @@
 import { model, Schema } from 'mongoose';
-import { userNameSchema } from '../user/user.model';
-import { TAdmin } from './admin.interface';
-import AppError from '../../errors/AppError';
 import status from 'http-status';
+import { TFaculty } from './faculty.interface';
+import { userNameSchema } from '../user/user.model';
+import AppError from '../../errors/AppError';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 
-const adminSchema = new Schema<TAdmin>(
+const facultySchema = new Schema<TFaculty>(
     {
         id: { type: String },
         user: { type: Schema.Types.ObjectId, require: true },
@@ -29,6 +30,7 @@ const adminSchema = new Schema<TAdmin>(
         presentAddress: { type: String, required: true },
         permanentAddress: { type: String, required: true },
         profileImg: { type: String },
+        academicDepartment: { type: Schema.Types.ObjectId, require: true },
         isDeleted: {
             type: Boolean,
             default: false,
@@ -40,40 +42,47 @@ const adminSchema = new Schema<TAdmin>(
 );
 
 // Query Middleware,
-adminSchema.pre('find', function (next) {
+facultySchema.pre('find', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 
-adminSchema.pre('findOne', function (next) {
+facultySchema.pre('findOne', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 
-adminSchema.pre('findOneAndUpdate', function (next) {
+facultySchema.pre('findOneAndUpdate', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 
-adminSchema.pre('aggregate', function (next) {
+facultySchema.pre('aggregate', function (next) {
     this.pipeline().unshift({
         $match: { isDeleted: { $ne: true } },
     });
     next();
 });
 
-adminSchema.pre('save', async function (next) {
-    const existingId = await Admin.findOne({ id: this.id });
+facultySchema.pre('save', async function (next) {
+    const existingId = await Faculty.findOne({ id: this.id });
     if (existingId) {
-        throw new AppError(status.CONFLICT, 'Admin already exists');
+        throw new AppError(status.CONFLICT, 'Faculty already exists');
     }
 
-    const existingEmail = await Admin.findOne({ email: this.email });
+    const academicDepartment = await AcademicDepartment.findById(
+        this.academicDepartment,
+    );
+    if (!academicDepartment) {
+        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+    }
+
+    const existingEmail = await Faculty.findOne({ email: this.email });
     if (existingEmail) {
         throw new AppError(status.CONFLICT, 'Email already exists');
     }
 
-    const existingContactNumber = await Admin.findOne({
+    const existingContactNumber = await Faculty.findOne({
         contactNumber: this.contactNumber,
     });
     if (existingContactNumber) {
@@ -82,4 +91,4 @@ adminSchema.pre('save', async function (next) {
     next();
 });
 
-export const Admin = model<TAdmin>('Admin', adminSchema);
+export const Faculty = model<TFaculty>('Faculty', facultySchema);

@@ -29,7 +29,21 @@ const createAdmin = catchAsync(async (req, res) => {
     });
 });
 
+const createFaculty = catchAsync(async (req, res) => {
+    const { password, faculty } = req.body;
+
+    const result = await UserServices.createFacultyIntoDB(password, faculty);
+
+    sendResponse(res, {
+        statusCode: status.CREATED,
+        success: true,
+        message: 'Faculty created successfully',
+        data: result,
+    });
+});
+
 export const UserControllers = {
     createStudent,
     createAdmin,
+    createFaculty,
 };

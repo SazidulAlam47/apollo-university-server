@@ -1,31 +1,31 @@
 import mongoose from 'mongoose';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { adminSearchableFields } from './admin.constant';
-import { TAdmin } from './admin.interface';
-import { Admin } from './admin.model';
-import AppError from '../../errors/AppError';
 import status from 'http-status';
+import { Faculty } from './faculty.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 import { User } from '../user/user.model';
+import AppError from '../../errors/AppError';
+import { TFaculty } from './faculty.interface';
+import { facultySearchableFields } from './faculty.constant';
 
-const getAllAdminFromDB = async (query: Record<string, unknown>) => {
-    const adminPopulate = Admin.find().populate('name');
-    const adminQuery = new QueryBuilder(adminPopulate, query)
-        .search(adminSearchableFields)
+const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
+    const facultyPopulate = Faculty.find().populate('name');
+    const facultyQuery = new QueryBuilder(facultyPopulate, query)
+        .search(facultySearchableFields)
         .filter()
         .paginate()
         .sort()
         .fields();
 
-    const result = await adminQuery.modelQuery;
+    const result = await facultyQuery.modelQuery;
     return result;
 };
 
-const getAdminByIdIntoDB = async (id: string) => {
-    const result = await Admin.findOne({ id });
+const getFacultyByIdIntoDB = async (id: string) => {
+    const result = await Faculty.findOne({ id });
     return result;
 };
 
-const updateAdminByIdIntoDB = async (id: string, payload: TAdmin) => {
+const updateFacultyByIdIntoDB = async (id: string, payload: TFaculty) => {
     const { name, ...primitiveData } = payload;
 
     const modifiedData: Record<string, unknown> = primitiveData;
@@ -39,29 +39,29 @@ const updateAdminByIdIntoDB = async (id: string, payload: TAdmin) => {
         }
     });
 
-    const result = await Admin.findOneAndUpdate({ id }, modifiedData, {
+    const result = await Faculty.findOneAndUpdate({ id }, modifiedData, {
         new: true,
         runValidators: true,
     });
     return result;
 };
 
-const deleteAdminFromDB = async (id: string) => {
+const deleteFacultyFromDB = async (id: string) => {
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
-        const deletedAdmin = await Admin.findOneAndUpdate(
+        const deletedFaculty = await Faculty.findOneAndUpdate(
             { id },
             { isDeleted: true },
             { new: true, session },
         );
 
-        if (!deletedAdmin) {
-            throw new AppError(status.NOT_FOUND, 'Admin not found');
+        if (!deletedFaculty) {
+            throw new AppError(status.NOT_FOUND, 'Faculty not found');
         }
 
         const deletedUser = await User.findOneAndUpdate(
-            { role: 'admin', id },
+            { role: 'faculty', id },
             { isDeleted: true },
             { new: true, session },
         );
@@ -72,7 +72,7 @@ const deleteAdminFromDB = async (id: string) => {
         await session.commitTransaction();
         await session.endSession();
 
-        return deletedAdmin;
+        return deletedFaculty;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -82,9 +82,9 @@ const deleteAdminFromDB = async (id: string) => {
     }
 };
 
-export const AdminServices = {
-    getAllAdminFromDB,
-    getAdminByIdIntoDB,
-    updateAdminByIdIntoDB,
-    deleteAdminFromDB,
+export const FacultyServices = {
+    getAllFacultyFromDB,
+    getFacultyByIdIntoDB,
+    updateFacultyByIdIntoDB,
+    deleteFacultyFromDB,
 };
