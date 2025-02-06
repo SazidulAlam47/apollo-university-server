@@ -1,9 +1,12 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, UpdateQuery } from 'mongoose';
 import {
     TCourse,
     TCourseFaculty,
     TPreRequisiteCourse,
 } from './course.interface';
+import AppError from '../../errors/AppError';
+import status from 'http-status';
+import { Faculty } from '../faculty/faculty.model';
 
 const preRequisiteCourseSchema = new Schema<TPreRequisiteCourse>(
     {
@@ -56,8 +59,40 @@ const courseFacultySchema = new Schema<TCourseFaculty>({
     },
     faculties: {
         type: [Schema.Types.ObjectId],
+        required: true,
         ref: 'Faculty',
     },
+});
+
+courseFacultySchema.pre('findOneAndUpdate', async function (next) {
+    const courseId: string = this.getQuery()?._id;
+
+    const update = this.getUpdate() as UpdateQuery<unknown>;
+
+    const facultyIds: string[] =
+        update?.$addToSet?.faculties?.$each ||
+        update?.$pull?.faculties?.$in ||
+        [];
+
+    const existingCourse = await Course.findById(courseId);
+    if (!existingCourse) {
+        throw new AppError(status.NOT_FOUND, 'Course not found');
+    }
+
+    if (facultyIds.length) {
+        const existingFaculties = await Faculty.find(
+            {
+                _id: { $in: facultyIds },
+            },
+            { _id: 1 },
+        );
+
+        if (facultyIds.length !== existingFaculties.length) {
+            throw new AppError(status.NOT_FOUND, 'Faculties not found');
+        }
+    }
+
+    next();
 });
 
 export const CourseFaculty = model<TCourseFaculty>(
