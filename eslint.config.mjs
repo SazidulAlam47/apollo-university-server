@@ -20,6 +20,7 @@ export default [
             'no-unused-expressions': 'error',
             'no-console': 'warn',
             'no-undef': 'error',
+            'prettier/prettier': ['error', { endOfLine: 'auto' }],
         },
     },
     {
