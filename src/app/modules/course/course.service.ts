@@ -1,7 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { courseSearchableFields } from './course.constant';
-import { TCourse, TCourseFaculty } from './course.interface';
+import {
+    TCourse,
+    TCourseFaculty,
+    TPreRequisiteCourse,
+} from './course.interface';
 import { Course, CourseFaculty } from './course.model';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
@@ -65,9 +69,10 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
         // update preRequisiteCourses
         if (preRequisiteCourses && preRequisiteCourses.length) {
             // delete
-            const deletingPreRequisiteIds = preRequisiteCourses
-                .filter((el) => el.course && el.isDeleted)
-                .map((el) => el.course);
+            const deletingPreRequisiteIds: Types.ObjectId[] =
+                preRequisiteCourses
+                    .filter((el) => el.course && el.isDeleted)
+                    .map((el) => el.course);
 
             const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
                 id,
@@ -92,9 +97,8 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
             }
 
             // add
-            const newPreRequisite = preRequisiteCourses.filter(
-                (el) => el.course && !el.isDeleted,
-            );
+            const newPreRequisite: TPreRequisiteCourse[] =
+                preRequisiteCourses.filter((el) => el.course && !el.isDeleted);
 
             const newPreRequisiteCourses = await Course.findByIdAndUpdate(
                 id,
