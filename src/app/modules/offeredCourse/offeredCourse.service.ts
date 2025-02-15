@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { OfferedCourse } from './offeredCourse.model';
 import { TOfferedCourse } from './offeredCourse.interface';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
@@ -15,6 +16,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
         academicDepartment,
         course,
         faculty,
+        section,
     } = payload;
 
     const isSemesterRegistrationExists =
@@ -37,6 +39,18 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
         throw new AppError(status.NOT_FOUND, 'Academic Department not found');
     }
 
+    // check if the department is belong to the faculty
+    if (
+        !isAcademicDepartmentExists.academicFaculty.equals(
+            new Types.ObjectId(academicFaculty),
+        )
+    ) {
+        throw new AppError(
+            status.CONFLICT,
+            `Department of ${isAcademicDepartmentExists.name} is not belong to Faculty of ${isAcademicFacultyExists.name}`,
+        );
+    }
+
     const isCourseExists = await Course.findById(course);
     if (!isCourseExists) {
         throw new AppError(status.NOT_FOUND, 'Course not found');
@@ -45,6 +59,19 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     const isFacultyExists = await Faculty.findById(faculty);
     if (!isFacultyExists) {
         throw new AppError(status.NOT_FOUND, 'Faculty not found');
+    }
+
+    // same course is already offered or not
+    const isCourseAlreadyOffered = await OfferedCourse.findOne({
+        semesterRegistration,
+        course,
+        section,
+    });
+    if (isCourseAlreadyOffered) {
+        throw new AppError(
+            status.CONFLICT,
+            'Offered corse with same section is already exists!',
+        );
     }
 
     const result = await OfferedCourse.create(payload);
