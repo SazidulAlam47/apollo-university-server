@@ -41,15 +41,11 @@ const createOfferedCourseValidationSchema = z.object({
 const updateOfferedCourseValidationSchema = z.object({
     body: z
         .object({
-            faculty: z.string().optional(),
+            faculty: z.string(),
             maxCapacity: z.number().optional(),
-            section: z.number().optional(),
-            days: z
-                .enum(Days as [string, ...string[]])
-                .array()
-                .optional(),
-            startTime: timeValidationSchema.optional(),
-            endTime: timeValidationSchema.optional(),
+            days: z.enum(Days as [string, ...string[]]).array(),
+            startTime: timeValidationSchema,
+            endTime: timeValidationSchema,
         })
         .refine(
             ({ startTime, endTime }) => {
