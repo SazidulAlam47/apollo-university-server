@@ -8,8 +8,9 @@ import { AcademicFaculty } from '../academicFaculty/academicFaculty.model';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
-import { hasTimeConflict } from './offeredCourse.utis';
+import { hasTimeConflict } from './offeredCourse.utils';
 import { registrationStatus } from '../semesterRegistration/semesterRegistration.constant';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     const {
@@ -154,7 +155,45 @@ const updateOfferedCourseIntoDB = async (
     return result;
 };
 
+const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
+    const populateOfferedCourse = OfferedCourse.find()
+        .populate('semesterRegistration')
+        .populate('academicSemester')
+        .populate('academicFaculty')
+        .populate('academicDepartment')
+        .populate('course')
+        .populate('faculty');
+
+    const OfferedCourseQuery = new QueryBuilder(populateOfferedCourse, query)
+        .paginate()
+        .filter()
+        .fields()
+        .sort();
+
+    const result = await OfferedCourseQuery.modelQuery;
+
+    return result;
+};
+
+const getOfferedCourseByIdFromDB = async (id: string) => {
+    const result = await OfferedCourse.findById(id)
+        .populate('semesterRegistration')
+        .populate('academicSemester')
+        .populate('academicFaculty')
+        .populate('academicDepartment')
+        .populate('course')
+        .populate('faculty');
+
+    if (!result) {
+        throw new AppError(status.NOT_FOUND, 'Offered Course not found');
+    }
+
+    return result;
+};
+
 export const OfferedCourseServices = {
     createOfferedCourseIntoDB,
     updateOfferedCourseIntoDB,
+    getAllOfferedCourseFromDB,
+    getOfferedCourseByIdFromDB,
 };

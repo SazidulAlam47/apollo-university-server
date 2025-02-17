@@ -38,6 +38,6 @@ const semesterRegistrationSchema = new Schema<TSemesterRegistration>(
 );
 
 export const SemesterRegistration = model<TSemesterRegistration>(
-    'semesterRegistration',
+    'SemesterRegistration',
     semesterRegistrationSchema,
 );

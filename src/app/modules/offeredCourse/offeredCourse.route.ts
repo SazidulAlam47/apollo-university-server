@@ -5,6 +5,9 @@ import { OfferedCourseControllers } from './offeredCourse.controller';
 
 const router = express.Router();
 
+router.get('/', OfferedCourseControllers.getAllOfferedCourse);
+router.get('/:id', OfferedCourseControllers.getOfferedCourseById);
+
 router.post(
     '/',
     validateRequest(

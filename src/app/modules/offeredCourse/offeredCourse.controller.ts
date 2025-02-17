@@ -29,7 +29,32 @@ const updateOfferedCourse = catchAsync(async (req, res) => {
     });
 });
 
+const getAllOfferedCourse = catchAsync(async (req, res) => {
+    const result = await OfferedCourseServices.getAllOfferedCourseFromDB(
+        req.query,
+    );
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: 'All Offered Course are retrieved successfully',
+        data: result,
+    });
+});
+
+const getOfferedCourseById = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await OfferedCourseServices.getOfferedCourseByIdFromDB(id);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: 'Offered Course is retrieved successfully',
+        data: result,
+    });
+});
+
 export const OfferedCourseControllers = {
     createOfferedCourse,
     updateOfferedCourse,
+    getAllOfferedCourse,
+    getOfferedCourseById,
 };
