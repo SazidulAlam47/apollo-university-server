@@ -56,13 +56,14 @@ const findLastOfficialId = async (role: string) => {
     const lastUser = await User.findOne({ role })
         .sort({ createdAt: -1 })
         .lean();
-    return lastUser?.id;
+    return lastUser?.id?.substring(2);
 };
 
 export const generateOfficialId = async (role: string) => {
     const currentId: string = (await findLastOfficialId(role)) || '0000';
-    const incrementId: string = (Number(currentId) + 1)
+    let incrementId: string = (Number(currentId) + 1)
         .toString()
         .padStart(4, '0');
+    incrementId = `${role.substring(0, 1).toUpperCase()}-${incrementId}`;
     return incrementId;
 };
