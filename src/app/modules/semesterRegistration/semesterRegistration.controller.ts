@@ -11,7 +11,7 @@ const createSemesterRegistration = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.CREATED,
         success: true,
-        message: 'Semester Registered successfully',
+        message: 'Semester is Registered successfully',
         data: result,
     });
 });
@@ -22,9 +22,9 @@ const getAllSemesterRegistration = catchAsync(async (req, res) => {
             req.query,
         );
     sendResponse(res, {
-        statusCode: status.CREATED,
+        statusCode: status.OK,
         success: true,
-        message: 'All Semester Registration retrieved successfully',
+        message: 'All Semester Registration is retrieved successfully',
         data: result,
     });
 });
@@ -36,9 +36,9 @@ const getSemesterRegistrationById = catchAsync(async (req, res) => {
             id,
         );
     sendResponse(res, {
-        statusCode: status.CREATED,
+        statusCode: status.OK,
         success: true,
-        message: 'Semester Registration retrieved successfully',
+        message: 'Semester Registration is retrieved successfully',
         data: result,
     });
 });
@@ -51,9 +51,21 @@ const updateSemesterRegistration = catchAsync(async (req, res) => {
             req.body,
         );
     sendResponse(res, {
-        statusCode: status.CREATED,
+        statusCode: status.OK,
         success: true,
-        message: 'Semester Registration updated successfully',
+        message: 'Semester Registration is updated successfully',
+        data: result,
+    });
+});
+
+const deleteSemesterRegistration = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result =
+        await SemesterRegistrationServices.deleteSemesterRegistrationFromDB(id);
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: 'Semester Registration is deleted successfully',
         data: result,
     });
 });
@@ -63,4 +75,5 @@ export const SemesterRegistrationControllers = {
     getAllSemesterRegistration,
     getSemesterRegistrationById,
     updateSemesterRegistration,
+    deleteSemesterRegistration,
 };

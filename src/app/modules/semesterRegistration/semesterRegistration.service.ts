@@ -5,6 +5,8 @@ import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { registrationStatus } from './semesterRegistration.constant';
+import { startSession } from 'mongoose';
+import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
 
 const createSemesterRegistrationIntoDB = async (
     payload: TSemesterRegistration,
@@ -109,9 +111,66 @@ const updateSemesterRegistrationIntoDB = async (
     return result;
 };
 
+const deleteSemesterRegistrationFromDB = async (id: string) => {
+    const deletedSemesterRegistration = await SemesterRegistration.findById(id);
+
+    if (!deletedSemesterRegistration) {
+        throw new AppError(status.NOT_FOUND, 'Semester Registration not found');
+    }
+
+    if (deletedSemesterRegistration.status !== registrationStatus.Upcoming) {
+        throw new AppError(
+            status.BAD_REQUEST,
+            `Semester Registration can not be deleted because it is ${deletedSemesterRegistration.status}`,
+        );
+    }
+
+    const session = await startSession();
+    try {
+        session.startTransaction();
+
+        const result = await SemesterRegistration.findByIdAndDelete(id, {
+            session,
+        });
+
+        if (!result) {
+            throw new AppError(
+                status.BAD_REQUEST,
+                'Filed to delete Semester Registration',
+            );
+        }
+
+        const deletedOfferedCourses = await OfferedCourse.deleteMany(
+            {
+                semesterRegistration: id,
+            },
+            { session },
+        );
+
+        if (!deletedOfferedCourses.acknowledged) {
+            throw new AppError(
+                status.BAD_REQUEST,
+                'Filed to delete Offered Courses of this semester',
+            );
+        }
+
+        await session.commitTransaction();
+        await session.endSession();
+
+        return result;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        session.abortTransaction();
+        session.endSession();
+        throw new AppError(error.statusCode, error.message);
+    }
+};
+
 export const SemesterRegistrationServices = {
     createSemesterRegistrationIntoDB,
     getAllSemesterRegistrationFromDB,
     getSemesterRegistrationByIdFromDB,
     updateSemesterRegistrationIntoDB,
+    deleteSemesterRegistrationFromDB,
 };
