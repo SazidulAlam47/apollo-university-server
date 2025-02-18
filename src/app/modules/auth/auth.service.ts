@@ -1,12 +1,11 @@
 import status from 'http-status';
-import bcrypt from 'bcrypt';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 
 const loginUser = async (payload: TLoginUser) => {
     // if the user is exists
-    const isUserExists = await User.findOne({ id: payload.id });
+    const isUserExists = await User.isUserExistsByCustomId(payload.id);
 
     if (!isUserExists) {
         throw new AppError(status.NOT_FOUND, 'User not fund');
@@ -18,11 +17,9 @@ const loginUser = async (payload: TLoginUser) => {
         throw new AppError(status.FORBIDDEN, 'User is blocked');
     }
     // checking password
-    const isPasswordMatched = await bcrypt.compare(
-        payload.password,
-        isUserExists.password,
-    );
-    if (!isPasswordMatched) {
+    if (
+        !(await User.isPasswordMatched(payload.password, isUserExists.password))
+    ) {
         throw new AppError(status.FORBIDDEN, 'Password did not matched');
     }
 
