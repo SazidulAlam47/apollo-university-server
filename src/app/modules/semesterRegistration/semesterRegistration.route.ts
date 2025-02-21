@@ -2,6 +2,7 @@ import { SemesterRegistrationValidations } from './semesterRegistration.validati
 import { Router } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { SemesterRegistrationControllers } from './semesterRegistration.controller';
+import auth from '../../middlewares/auth';
 
 const router = Router();
 
@@ -10,6 +11,7 @@ router.get('/:id', SemesterRegistrationControllers.getSemesterRegistrationById);
 
 router.post(
     '/',
+    auth('admin'),
     validateRequest(
         SemesterRegistrationValidations.createSemesterRegistrationValidationSchema,
     ),
@@ -18,6 +20,7 @@ router.post(
 
 router.patch(
     '/:id',
+    auth('admin'),
     validateRequest(
         SemesterRegistrationValidations.updateSemesterRegistrationValidationSchema,
     ),
@@ -26,6 +29,7 @@ router.patch(
 
 router.delete(
     '/:id',
+    auth('admin'),
     SemesterRegistrationControllers.deleteSemesterRegistration,
 );
 
