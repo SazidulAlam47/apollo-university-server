@@ -3,8 +3,10 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
+import { createToken } from './auth.utils';
+import ms from 'ms';
 
 const loginUser = async (payload: TLoginUser) => {
     // if the user is exists
@@ -30,13 +32,23 @@ const loginUser = async (payload: TLoginUser) => {
         role: user.role,
     };
 
-    const accessToken = jwt.sign(
+    const accessToken = createToken(
         jwtPayload,
-        config.jwt_access_token as string,
-        { expiresIn: '10d' },
+        config.jwt_access_secret as string,
+        config.jwt_access_expires_in as ms.StringValue,
     );
 
-    return { accessToken, needsPasswordChange: user.needsPasswordChange };
+    const refreshToken = createToken(
+        jwtPayload,
+        config.jwt_refresh_secret as string,
+        config.jwt_refresh_expires_in as ms.StringValue,
+    );
+
+    return {
+        accessToken,
+        refreshToken,
+        needsPasswordChange: user.needsPasswordChange,
+    };
 };
 
 const changePassword = async (
