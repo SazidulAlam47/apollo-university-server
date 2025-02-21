@@ -5,6 +5,7 @@ import catchAsync from '../utils/catchAsync';
 import AppError from '../errors/AppError';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
+import { User } from '../modules/user/user.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
     return catchAsync(
@@ -17,31 +18,40 @@ const auth = (...requiredRoles: TUserRole[]) => {
                 );
             }
             // check the token is valid
-            jwt.verify(
+            const decoded = jwt.verify(
                 token,
                 config.jwt_access_token as string,
-                function (err, decoded) {
-                    // err
-                    if (err) {
-                        throw new AppError(
-                            status.UNAUTHORIZED,
-                            'You are not authorized',
-                        );
-                    }
-                    // decoded
+            ) as JwtPayload;
 
-                    const role = (decoded as JwtPayload)?.role;
+            const { id, role, iat } = decoded;
 
-                    if (requiredRoles.length && !requiredRoles.includes(role)) {
-                        throw new AppError(
-                            status.FORBIDDEN,
-                            'Forbidden access',
-                        );
-                    }
-                    req.user = decoded as JwtPayload;
-                    next();
-                },
-            );
+            const user = await User.isUserExistsByCustomId(id);
+
+            if (!user) {
+                throw new AppError(status.NOT_FOUND, 'User not fund');
+            }
+            if (user.isDeleted) {
+                throw new AppError(status.FORBIDDEN, 'User is deleted');
+            }
+            if (user.status === 'blocked') {
+                throw new AppError(status.FORBIDDEN, 'User is blocked');
+            }
+
+            if (
+                user?.passwordChangedAt &&
+                User.isJWTIssuedBeforePasswordChanged(
+                    user.passwordChangedAt,
+                    iat as number,
+                )
+            ) {
+                throw new AppError(status.UNAUTHORIZED, 'User is Unauthorized');
+            }
+
+            if (requiredRoles.length && !requiredRoles.includes(role)) {
+                throw new AppError(status.FORBIDDEN, 'Forbidden access');
+            }
+            req.user = decoded;
+            next();
         },
     );
 };
