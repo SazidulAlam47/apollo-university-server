@@ -1,7 +1,7 @@
+import bcrypt from 'bcrypt';
 import { model, Schema } from 'mongoose';
 import { TUser, TUserName, UserModel } from './user.interface';
 import config from '../../config';
-import bcrypt from 'bcrypt';
 
 export const userNameSchema = new Schema<TUserName>(
     {
