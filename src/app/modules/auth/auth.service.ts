@@ -3,7 +3,7 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import { createToken } from './auth.utils';
 import ms from 'ms';
@@ -93,7 +93,50 @@ const changePassword = async (
     return null;
 };
 
+const refreshToken = async (refreshToken: string) => {
+    // check the token is valid
+    const decoded = jwt.verify(
+        refreshToken,
+        config.jwt_refresh_secret as string,
+    ) as JwtPayload;
+
+    const { id, role, iat } = decoded;
+
+    const user = await User.isUserExistsByCustomId(id);
+
+    if (!user) {
+        throw new AppError(status.NOT_FOUND, 'User not fund');
+    }
+    if (user.isDeleted) {
+        throw new AppError(status.FORBIDDEN, 'User is deleted');
+    }
+    if (user.status === 'blocked') {
+        throw new AppError(status.FORBIDDEN, 'User is blocked');
+    }
+
+    if (
+        user?.passwordChangedAt &&
+        User.isJWTIssuedBeforePasswordChanged(
+            user.passwordChangedAt,
+            iat as number,
+        )
+    ) {
+        throw new AppError(status.UNAUTHORIZED, 'User is Unauthorized');
+    }
+
+    const jwtPayload = { id, role };
+
+    const accessToken = createToken(
+        jwtPayload,
+        config.jwt_access_secret as string,
+        config.jwt_access_expires_in as ms.StringValue,
+    );
+
+    return { accessToken };
+};
+
 export const AuthServices = {
     loginUser,
     changePassword,
+    refreshToken,
 };

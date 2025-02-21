@@ -14,7 +14,14 @@ const changePasswordValidationSchema = z.object({
     }),
 });
 
+const refreshTokenValidationSchema = z.object({
+    cookies: z.object({
+        refreshToken: z.string({ required_error: 'You are not authorized' }),
+    }),
+});
+
 export const AuthValidations = {
     loginValidationSchema,
     changePasswordValidationSchema,
+    refreshTokenValidationSchema,
 };
