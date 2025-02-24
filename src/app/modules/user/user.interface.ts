@@ -10,6 +10,7 @@ export interface TUserName {
 
 export interface TUser {
     id: string;
+    email: string;
     password: string;
     needsPasswordChange: boolean;
     passwordChangedAt?: Date;

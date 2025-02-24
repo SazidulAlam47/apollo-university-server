@@ -7,6 +7,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import { createToken } from './auth.utils';
 import ms from 'ms';
+import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
     // if the user is exists
@@ -135,8 +136,55 @@ const refreshToken = async (refreshToken: string) => {
     return { accessToken };
 };
 
+const forgetPassword = async (id: string) => {
+    const user = await User.isUserExistsByCustomId(id);
+
+    if (!user) {
+        throw new AppError(status.NOT_FOUND, 'User not fund');
+    }
+    if (user.isDeleted) {
+        throw new AppError(status.FORBIDDEN, 'User is deleted');
+    }
+    if (user.status === 'blocked') {
+        throw new AppError(status.FORBIDDEN, 'User is blocked');
+    }
+
+    const jwtPayload = {
+        id: user.id,
+        role: user.role,
+    };
+
+    const resetToken = createToken(
+        jwtPayload,
+        config.jwt_access_secret as string,
+        '10m',
+    );
+
+    const resetLink = `${config.client_url}?id=${user.id}&token=${resetToken}`;
+
+    const subject = 'Reset Password';
+    const htmlBody = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="text-align: center; color: #333;">Password Reset Request</h2>
+            <p>Hello ${user.id},</p>
+            <p>You requested to reset your password. Click the button below to reset it:</p>
+            <div style="text-align: center; margin: 20px 0;">
+            <a href="${resetLink}" style="background-color: #007bff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+            </div>
+            <p>If you didn’t request this, you can safely ignore this email.</p>
+            <p>Regards,</p>
+            <p><strong>PH University</strong></p>
+        </div>
+        `;
+
+    await sendEmail(user.email, subject, htmlBody);
+
+    return null;
+};
+
 export const AuthServices = {
     loginUser,
     changePassword,
     refreshToken,
+    forgetPassword,
 };
