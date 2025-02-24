@@ -43,8 +43,8 @@ const createFaculty = catchAsync(async (req, res) => {
 });
 
 const getMe = catchAsync(async (req, res) => {
-    const token = req.headers.authorization as string;
-    const result = await UserServices.getMeFromDB(token);
+    const { id, role } = req.user;
+    const result = await UserServices.getMeFromDB(id, role);
     sendResponse(res, {
         statusCode: status.CREATED,
         success: true,
