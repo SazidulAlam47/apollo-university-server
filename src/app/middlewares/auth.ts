@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import status from 'http-status';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../utils/catchAsync';
 import AppError from '../errors/AppError';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
+import { verifyToken } from '../modules/auth/auth.utils';
 
 const auth = (...requiredRoles: TUserRole[]) => {
     return catchAsync(
@@ -18,23 +18,26 @@ const auth = (...requiredRoles: TUserRole[]) => {
                 );
             }
             // check the token is valid
-            const decoded = jwt.verify(
+            const decoded = verifyToken(
                 token,
                 config.jwt_access_secret as string,
-            ) as JwtPayload;
+            );
 
             const { id, role, iat } = decoded;
 
             const user = await User.isUserExistsByCustomId(id);
 
             if (!user) {
-                throw new AppError(status.NOT_FOUND, 'User not fund');
+                throw new AppError(
+                    status.UNAUTHORIZED,
+                    'You are not authorized',
+                );
             }
             if (user.isDeleted) {
-                throw new AppError(status.FORBIDDEN, 'User is deleted');
+                throw new AppError(status.FORBIDDEN, 'Forbidden access');
             }
             if (user.status === 'blocked') {
-                throw new AppError(status.FORBIDDEN, 'User is blocked');
+                throw new AppError(status.FORBIDDEN, 'Forbidden access');
             }
 
             if (
@@ -44,7 +47,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
                     iat as number,
                 )
             ) {
-                throw new AppError(status.UNAUTHORIZED, 'User is Unauthorized');
+                throw new AppError(status.FORBIDDEN, 'Forbidden access');
             }
 
             if (requiredRoles.length && !requiredRoles.includes(role)) {

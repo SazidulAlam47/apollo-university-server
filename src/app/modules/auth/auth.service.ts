@@ -3,9 +3,9 @@ import status from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import ms from 'ms';
 import { sendEmail } from '../../utils/sendEmail';
 
@@ -96,10 +96,10 @@ const changePassword = async (
 
 const refreshToken = async (refreshToken: string) => {
     // check the token is valid
-    const decoded = jwt.verify(
+    const decoded = verifyToken(
         refreshToken,
         config.jwt_refresh_secret as string,
-    ) as JwtPayload;
+    );
 
     const { id, role, iat } = decoded;
 
@@ -203,10 +203,7 @@ const resetPassword = async (
         throw new AppError(status.UNAUTHORIZED, 'You are not authorized');
     }
     // check the token is valid
-    const decoded = jwt.verify(
-        token,
-        config.jwt_reset_secret as string,
-    ) as JwtPayload;
+    const decoded = verifyToken(token, config.jwt_reset_secret as string);
 
     if (id !== decoded.id) {
         throw new AppError(status.FORBIDDEN, 'Forbidden access');

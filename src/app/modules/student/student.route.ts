@@ -6,14 +6,14 @@ import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-router.get('/', auth(), StudentControllers.getAllStudents);
-router.get('/:id', auth(), StudentControllers.getStudentById);
+router.get('/', auth('faculty', 'admin'), StudentControllers.getAllStudents);
+router.get('/:id', auth('faculty', 'admin'), StudentControllers.getStudentById);
 
 router.delete('/:id', auth('admin'), StudentControllers.deleteStudent);
 
 router.patch(
     '/:id',
-    auth('student', 'admin'),
+    auth('admin'),
     validateRequest(StudentValidations.updateStudentValidationSchema),
     StudentControllers.updateStudent,
 );

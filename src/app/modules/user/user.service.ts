@@ -12,6 +12,8 @@ import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
 import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
+import { verifyToken } from '../auth/auth.utils';
+import { UserRole } from './user.constant';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const admissionSemester = await AcademicSemester.findById(
@@ -149,8 +151,37 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     }
 };
 
+const getMeFromDB = async (token: string) => {
+    if (!token) {
+        throw new AppError(status.UNAUTHORIZED, 'You are not authorized');
+    }
+    // check the token is valid
+    const decoded = verifyToken(token, config.jwt_access_secret as string);
+
+    const { id, role } = decoded;
+
+    let result = null;
+    if (role === UserRole.student) {
+        result = await Student.findOne({ id })
+            .populate('admissionSemester')
+            .populate({
+                path: 'academicDepartment',
+                populate: {
+                    path: 'academicFaculty',
+                },
+            });
+    } else if (role === UserRole.faculty) {
+        result = await Faculty.findOne({ id });
+    } else if (role === UserRole.admin) {
+        result = await Admin.findOne({ id });
+    }
+
+    return result;
+};
+
 export const UserServices = {
     createStudentIntoDB,
     createAdminIntoDB,
     createFacultyIntoDB,
+    getMeFromDB,
 };
