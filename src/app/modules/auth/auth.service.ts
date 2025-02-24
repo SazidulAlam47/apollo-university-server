@@ -156,7 +156,7 @@ const forgetPassword = async (id: string) => {
 
     const resetToken = createToken(
         jwtPayload,
-        config.jwt_access_secret as string,
+        config.jwt_reset_secret as string,
         '10m',
     );
 
@@ -182,9 +182,62 @@ const forgetPassword = async (id: string) => {
     return null;
 };
 
+const resetPassword = async (
+    token: string | undefined,
+    id: string,
+    password: string,
+) => {
+    const user = await User.isUserExistsByCustomId(id);
+
+    if (!user) {
+        throw new AppError(status.NOT_FOUND, 'User not fund');
+    }
+    if (user.isDeleted) {
+        throw new AppError(status.FORBIDDEN, 'User is deleted');
+    }
+    if (user.status === 'blocked') {
+        throw new AppError(status.FORBIDDEN, 'User is blocked');
+    }
+
+    if (!token) {
+        throw new AppError(status.UNAUTHORIZED, 'You are not authorized');
+    }
+    // check the token is valid
+    const decoded = jwt.verify(
+        token,
+        config.jwt_reset_secret as string,
+    ) as JwtPayload;
+
+    if (id !== decoded.id) {
+        throw new AppError(status.FORBIDDEN, 'Forbidden access');
+    }
+
+    const hashedPassword = await bcrypt.hash(
+        password,
+        Number(config.bcrypt_salt_round),
+    );
+
+    await User.findOneAndUpdate(
+        {
+            id: decoded.id,
+            role: decoded.role,
+        },
+        {
+            password: hashedPassword,
+            needsPasswordChange: false,
+            passwordChangedAt: new Date(),
+        },
+        {
+            new: true,
+        },
+    );
+    return null;
+};
+
 export const AuthServices = {
     loginUser,
     changePassword,
     refreshToken,
     forgetPassword,
+    resetPassword,
 };
