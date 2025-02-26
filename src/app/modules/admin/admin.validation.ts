@@ -6,7 +6,7 @@ import {
 
 const createAdminValidationSchema = z.object({
     body: z.object({
-        password: z.string(),
+        password: z.string().max(20).optional(),
         admin: z.object({
             name: createUserNameValidationSchema,
             designation: z.string(),
@@ -19,7 +19,6 @@ const createAdminValidationSchema = z.object({
                 .optional(),
             presentAddress: z.string(),
             permanentAddress: z.string(),
-            profileImg: z.string().optional(),
         }),
     }),
 });
@@ -38,7 +37,6 @@ const updateAdminValidationSchema = z.object({
                 .optional(),
             presentAddress: z.string().optional(),
             permanentAddress: z.string().optional(),
-            profileImg: z.string().optional().optional(),
         }),
     }),
 });

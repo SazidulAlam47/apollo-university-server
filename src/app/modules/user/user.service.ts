@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import config from '../../config';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { generateOfficialId, generateStudentId } from './user.utils';
@@ -13,8 +14,13 @@ import { Admin } from '../admin/admin.model';
 import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
 import { UserRole } from './user.constant';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+    password: string,
+    payload: TStudent,
+    file: any,
+) => {
     const admissionSemester = await AcademicSemester.findById(
         payload.admissionSemester,
     );
@@ -49,6 +55,12 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
         payload.id = newUser[0].id;
         payload.user = newUser[0]._id;
 
+        // send image to cloudinary and add to url
+        const imgName = `${generatedId}${payload.name.firstName}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        payload.profileImg = imgUrl;
+
         //create a student (transaction-2)
         const newStudent = await Student.create([payload], { session });
 
@@ -60,7 +72,6 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
         await session.endSession();
 
         return newStudent[0];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();
@@ -68,7 +79,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     }
 };
 
-const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+const createAdminIntoDB = async (
+    password: string,
+    payload: TAdmin,
+    file: any,
+) => {
     const generatedId: string = await generateOfficialId('admin');
 
     const userData: Partial<TUser> = {
@@ -91,6 +106,12 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
         payload.id = newUser[0].id;
         payload.user = newUser[0]._id;
 
+        // send image to cloudinary and add to url
+        const imgName = `${generatedId}${payload.name.firstName}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        payload.profileImg = imgUrl;
+
         const newAdmin = await Admin.create([payload], { session });
 
         if (!newAdmin) {
@@ -100,8 +121,6 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
         await session.endSession();
 
         return newAdmin[0];
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();
@@ -109,7 +128,11 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
     }
 };
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+    password: string,
+    payload: TFaculty,
+    file: any,
+) => {
     const generatedId: string = await generateOfficialId('faculty');
 
     const userData: Partial<TUser> = {
@@ -132,6 +155,12 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
         payload.id = newUser[0].id;
         payload.user = newUser[0]._id;
 
+        // send image to cloudinary and add to url
+        const imgName = `${generatedId}${payload.name.firstName}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        payload.profileImg = imgUrl;
+
         const newFaculty = await Faculty.create([payload], { session });
 
         if (!newFaculty) {
@@ -141,8 +170,6 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
         await session.endSession();
 
         return newFaculty[0];
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();
@@ -172,7 +199,6 @@ const getMeFromDB = async (id: string, role: string) => {
 
 const changeStatusIntoDB = async (id: string, status: string) => {
     const result = await User.findByIdAndUpdate(id, { status }, { new: true });
-    console.log(result);
     return result;
 };
 

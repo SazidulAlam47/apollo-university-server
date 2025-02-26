@@ -6,7 +6,7 @@ import {
 
 const createFacultyValidationSchema = z.object({
     body: z.object({
-        password: z.string(),
+        password: z.string().max(20).optional(),
         faculty: z.object({
             name: createUserNameValidationSchema,
             designation: z.string(),
@@ -19,7 +19,6 @@ const createFacultyValidationSchema = z.object({
                 .optional(),
             presentAddress: z.string(),
             permanentAddress: z.string(),
-            profileImg: z.string().optional(),
             academicDepartment: z.string(),
         }),
     }),
@@ -39,7 +38,6 @@ const updateFacultyValidationSchema = z.object({
                 .optional(),
             presentAddress: z.string().optional(),
             permanentAddress: z.string().optional(),
-            profileImg: z.string().optional().optional(),
             academicDepartment: z.string().optional(),
         }),
     }),

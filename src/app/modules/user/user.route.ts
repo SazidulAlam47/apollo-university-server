@@ -6,12 +6,18 @@ import { AdminValidations } from '../admin/admin.validation';
 import { FacultyValidations } from '../faculty/faculty.validation';
 import auth from '../../middlewares/auth';
 import { UserValidations } from './user.validation';
+import { upload } from '../../utils/sendImageToCloudinary';
 
 const router = express.Router();
 
 router.post(
     '/create-student',
     auth('admin'),
+    upload.single('file'),
+    (req, res, next) => {
+        req.body = JSON.parse(req.body.data);
+        next();
+    },
     validateRequest(StudentValidations.createStudentValidationSchema),
     UserControllers.createStudent,
 );
@@ -19,6 +25,11 @@ router.post(
 router.post(
     '/create-faculty',
     auth('admin'),
+    upload.single('file'),
+    (req, res, next) => {
+        req.body = JSON.parse(req.body.data);
+        next();
+    },
     validateRequest(FacultyValidations.createFacultyValidationSchema),
     UserControllers.createFaculty,
 );
@@ -26,6 +37,11 @@ router.post(
 router.post(
     '/create-admin',
     // auth('admin'),
+    upload.single('file'),
+    (req, res, next) => {
+        req.body = JSON.parse(req.body.data);
+        next();
+    },
     validateRequest(AdminValidations.createAdminValidationSchema),
     UserControllers.createAdmin,
 );
