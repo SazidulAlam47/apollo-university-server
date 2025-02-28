@@ -1,3 +1,4 @@
+import { EnrolledCourseRoutes } from './../modules/enrolledCourse/enrolledCourse.route';
 import { Router } from 'express';
 import { AcademicSemesterRoutes } from './../modules/academicSemester/academicSemester.route';
 import { UserRoutes } from '../modules/user/user.route';
@@ -53,6 +54,10 @@ const moduleRoutes = [
     {
         path: '/offered-courses',
         route: OfferedCourseRoutes,
+    },
+    {
+        path: '/enrolled-courses',
+        route: EnrolledCourseRoutes,
     },
     {
         path: '/auth',
