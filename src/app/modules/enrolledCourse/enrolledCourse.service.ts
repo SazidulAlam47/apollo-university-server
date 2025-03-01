@@ -6,25 +6,31 @@ import { Student } from '../student/student.model';
 import EnrolledCourse from './enrolledCourse.model';
 import mongoose from 'mongoose';
 import { TEnrolledCourse } from './enrolledCourse.interface';
+import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
+import { Course } from '../course/course.model';
 
 const createEnrolledCourseIntoDB = async (
     userId: string,
     offeredCourseId: string,
 ) => {
-    const isOfferedCourseExists = await OfferedCourse.findById(offeredCourseId);
+    const offeredCourse = await OfferedCourse.findById(offeredCourseId);
 
-    if (!isOfferedCourseExists) {
+    if (!offeredCourse) {
         throw new AppError(status.NOT_FOUND, 'Offered Course not found');
     }
 
-    if (isOfferedCourseExists.maxCapacity <= 0) {
+    if (offeredCourse.maxCapacity <= 0) {
         throw new AppError(status.CONFLICT, 'Room is full');
     }
 
-    const student = await Student.findOne({ id: userId }).select('_id');
+    const student = await Student.findOne({ id: userId }, { _id: 1 });
+
+    if (!student) {
+        throw new AppError(status.NOT_FOUND, 'Student not found');
+    }
 
     const isStudentEnrolled = await EnrolledCourse.findOne({
-        semesterRegistration: isOfferedCourseExists.semesterRegistration,
+        semesterRegistration: offeredCourse.semesterRegistration,
         offeredCourse: offeredCourseId,
         student: student?._id,
     });
@@ -33,15 +39,77 @@ const createEnrolledCourseIntoDB = async (
         throw new AppError(status.CONFLICT, 'Student is already enrolled');
     }
 
+    // check max credit
+    const semesterRegistration = await SemesterRegistration.findById(
+        offeredCourse.semesterRegistration,
+        { maxCredit: 1 },
+    );
+
+    if (!semesterRegistration) {
+        throw new AppError(status.NOT_FOUND, 'Semester registration not found');
+    }
+
+    const enrolledCourses = await EnrolledCourse.aggregate([
+        {
+            $match: {
+                semesterRegistration: offeredCourse.semesterRegistration,
+                student: student?._id,
+                isEnrolled: true,
+            },
+        },
+        {
+            $lookup: {
+                from: 'courses',
+                localField: 'course',
+                foreignField: '_id',
+                as: 'course',
+            },
+        },
+        {
+            $unwind: '$course',
+        },
+        {
+            $group: {
+                _id: null,
+                totalEnrolledCredits: {
+                    $sum: '$course.credits',
+                },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                totalEnrolledCredits: 1,
+            },
+        },
+    ]);
+    const course = await Course.findById(offeredCourse.course, {
+        credits: 1,
+    });
+    if (!course) {
+        throw new AppError(status.NOT_FOUND, 'Course not found');
+    }
+
+    const totalEnrolledCredits: number =
+        enrolledCourses.length && enrolledCourses[0].totalEnrolledCredits
+            ? enrolledCourses[0].totalEnrolledCredits
+            : 0;
+    const currentCourseCredit: number = course.credits;
+    const maxCredit: number = semesterRegistration.maxCredit;
+
+    if (totalEnrolledCredits + currentCourseCredit > maxCredit) {
+        throw new AppError(status.BAD_REQUEST, 'Credit limit exceeded');
+    }
+
     const payload: Partial<TEnrolledCourse> = {
-        semesterRegistration: isOfferedCourseExists.semesterRegistration,
-        academicSemester: isOfferedCourseExists.academicSemester,
-        academicFaculty: isOfferedCourseExists.academicFaculty,
-        academicDepartment: isOfferedCourseExists.academicDepartment,
+        semesterRegistration: offeredCourse.semesterRegistration,
+        academicSemester: offeredCourse.academicSemester,
+        academicFaculty: offeredCourse.academicFaculty,
+        academicDepartment: offeredCourse.academicDepartment,
         offeredCourse: new mongoose.Types.ObjectId(offeredCourseId),
-        course: isOfferedCourseExists.course,
+        course: offeredCourse.course,
         student: student?._id,
-        faculty: isOfferedCourseExists.faculty,
+        faculty: offeredCourse.faculty,
         isEnrolled: true,
     };
 
