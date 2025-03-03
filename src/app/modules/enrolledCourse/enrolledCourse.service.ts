@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 import { Course } from '../course/course.model';
+import { Faculty } from '../faculty/faculty.model';
 
 const createEnrolledCourseIntoDB = async (
     userId: string,
@@ -148,6 +149,67 @@ const createEnrolledCourseIntoDB = async (
     }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+    id: string,
+    payload: Partial<TEnrolledCourse>,
+) => {
+    const faculty = await Faculty.findOne({ id }, { _id: 1 });
+
+    if (!faculty) {
+        throw new AppError(status.UNAUTHORIZED, 'Unauthorized access');
+    }
+
+    const { semesterRegistration, offeredCourse, student, courseMarks } =
+        payload;
+
+    const isSemesterRegistrationExists =
+        await SemesterRegistration.findById(semesterRegistration);
+
+    if (!isSemesterRegistrationExists) {
+        throw new AppError(status.NOT_FOUND, 'Semester Registration not found');
+    }
+
+    const isStudentExists = await Student.findById(student);
+
+    if (!isStudentExists) {
+        throw new AppError(status.NOT_FOUND, 'Student not found');
+    }
+
+    const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+
+    if (!isOfferedCourseExists) {
+        throw new AppError(status.NOT_FOUND, 'Offered Course not found');
+    }
+
+    const isEnrolledCourseExists = await EnrolledCourse.findOne({
+        semesterRegistration,
+        offeredCourse,
+        student,
+        faculty: faculty._id,
+    });
+
+    if (!isEnrolledCourseExists) {
+        throw new AppError(status.FORBIDDEN, 'Forbidden access');
+    }
+
+    const modifiedData: Record<string, unknown> = {};
+
+    if (courseMarks && Object.keys(courseMarks).length) {
+        Object.entries(courseMarks).forEach(([key, value]) => {
+            modifiedData[`courseMarks.${key}`] = value;
+        });
+    }
+
+    const result = await EnrolledCourse.findByIdAndUpdate(
+        isEnrolledCourseExists._id,
+        modifiedData,
+        { new: true },
+    );
+
+    return result;
+};
+
 export const EnrolledCourseServices = {
     createEnrolledCourseIntoDB,
+    updateEnrolledCourseMarksIntoDB,
 };
