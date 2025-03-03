@@ -9,6 +9,7 @@ import { TEnrolledCourse } from './enrolledCourse.interface';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
+import { calculateGradeAndPoints } from './enrolledCourse.utils';
 
 const createEnrolledCourseIntoDB = async (
     userId: string,
@@ -198,6 +199,23 @@ const updateEnrolledCourseMarksIntoDB = async (
         Object.entries(courseMarks).forEach(([key, value]) => {
             modifiedData[`courseMarks.${key}`] = value;
         });
+    }
+
+    if (courseMarks?.finalTerm) {
+        const { classTest1, classTest2, midTerm, finalTerm } =
+            isEnrolledCourseExists.courseMarks;
+
+        const totalMarks =
+            (courseMarks.classTest1 || classTest1) +
+            (courseMarks.classTest2 || classTest2) +
+            (courseMarks.midTerm || midTerm) +
+            (courseMarks.finalTerm || finalTerm);
+
+        const courseResult = calculateGradeAndPoints(totalMarks);
+
+        modifiedData.grade = courseResult.grade;
+        modifiedData.gradePoints = courseResult.gradePoints;
+        modifiedData.isCompleted = true;
     }
 
     const result = await EnrolledCourse.findByIdAndUpdate(
