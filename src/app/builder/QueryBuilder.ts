@@ -62,6 +62,30 @@ class QueryBuilder<T> {
         this.modelQuery = this.modelQuery.select(fieldsWithSpace);
         return this;
     }
+
+    async countTotal() {
+        const totalQueries = this.modelQuery.getFilter();
+        const totalData =
+            await this.modelQuery.model.countDocuments(totalQueries);
+        const limit: number = parseInt(this?.query?.limit as string) || 0;
+        const page: number =
+            parseInt(this?.query?.page as string) && limit
+                ? parseInt(this?.query?.page as string)
+                : 1;
+
+        const totalPage =
+            !Math.ceil(totalData / limit) ||
+            Math.ceil(totalData / limit) === Infinity
+                ? 1
+                : Math.ceil(totalData / limit);
+
+        return {
+            page,
+            limit,
+            totalData,
+            totalPage,
+        };
+    }
 }
 
 export default QueryBuilder;

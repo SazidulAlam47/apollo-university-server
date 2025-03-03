@@ -20,11 +20,13 @@ const getAllAcademicDepartmentFromDB = async (
         .filter()
         .sort()
         .paginate()
-        .fields();
+        .fields()
+        .search(['name']);
 
     const result = await academicDepartmentQuery.modelQuery;
+    const meta = await academicDepartmentQuery.countTotal();
 
-    return result;
+    return { meta, result };
 };
 
 const getAcademicDepartmentByIdFromDB = async (id: string) => {
