@@ -11,6 +11,16 @@ class QueryBuilder<T> {
 
     search(searchableFields: string[]) {
         const searchTerm: string = (this?.query?.searchTerm as string) || '';
+
+        // {email: {$regex: 'rav', $options: 'i'}}
+
+        /**
+         * { $or : [
+         *          {email: {$regex: 'rav', $options: 'i'}}
+         *          {'name.firstName': {$regex: 'rav', $options: 'i'}}
+         *      ]
+         * }
+         */
         if (searchTerm) {
             this.modelQuery = this.modelQuery.find({
                 $or: searchableFields.map(
