@@ -9,11 +9,15 @@ const router = express.Router();
 router.get('/', auth('faculty', 'admin'), StudentControllers.getAllStudents);
 router.get('/:id', auth('faculty', 'admin'), StudentControllers.getStudentById);
 
-router.delete('/:id', auth('admin'), StudentControllers.deleteStudent);
+router.delete(
+    '/:id',
+    auth('admin', 'superAdmin'),
+    StudentControllers.deleteStudent,
+);
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(StudentValidations.updateStudentValidationSchema),
     StudentControllers.updateStudent,
 );

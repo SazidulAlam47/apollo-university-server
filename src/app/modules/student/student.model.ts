@@ -66,7 +66,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
         permanentAddress: { type: String, required: true },
         guardian: { type: guardianSchema, required: true },
         localGuardian: { type: localGuardianSchema, required: true },
-        profileImg: { type: String },
+        profileImg: { type: String, default: '' },
         academicDepartment: {
             type: Schema.Types.ObjectId,
             ref: 'AcademicDepartment',

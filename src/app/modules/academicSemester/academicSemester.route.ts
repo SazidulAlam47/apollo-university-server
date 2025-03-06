@@ -11,7 +11,7 @@ router.get('/:id', AcademicSemesterControllers.getAcademicSemesterById);
 
 router.post(
     '/',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         AcademicSemesterValidations.createAcademicSemesterValidationSchema,
     ),
@@ -20,7 +20,7 @@ router.post(
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         AcademicSemesterValidations.updateAcademicSemesterValidationSchema,
     ),

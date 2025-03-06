@@ -42,7 +42,7 @@ router.get('/me', auth(), UserControllers.getMe);
 
 router.post(
     '/change-status/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(UserValidations.changeStatusValidationSchema),
     UserControllers.changeStatus,
 );

@@ -11,7 +11,7 @@ router.get('/:id', OfferedCourseControllers.getOfferedCourseById);
 
 router.post(
     '/',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         OfferedCourseValidations.createOfferedCourseValidationSchema,
     ),
@@ -20,7 +20,7 @@ router.post(
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         OfferedCourseValidations.updateOfferedCourseValidationSchema,
     ),
@@ -29,7 +29,7 @@ router.patch(
 
 router.delete(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     OfferedCourseControllers.deleteOfferedCourse,
 );
 

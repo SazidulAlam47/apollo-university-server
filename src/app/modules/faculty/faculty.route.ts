@@ -22,6 +22,10 @@ router.patch(
     FacultyControllers.updateFacultyById,
 );
 
-router.delete('/:id', auth('admin'), FacultyControllers.deleteFacultyById);
+router.delete(
+    '/:id',
+    auth('admin', 'superAdmin'),
+    FacultyControllers.deleteFacultyById,
+);
 
 export const FacultyRouters = router;

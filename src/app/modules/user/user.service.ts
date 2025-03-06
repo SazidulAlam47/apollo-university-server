@@ -66,10 +66,15 @@ const createStudentIntoDB = async (
         payload.user = newUser[0]._id;
 
         // send image to cloudinary and add to url
-        const imgName = `${generatedId}${payload.name.firstName}`;
-        const imgPath = file?.path;
-        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
-        payload.profileImg = imgUrl;
+        if (file) {
+            const imgName = `${generatedId}${payload.name.firstName}`;
+            const imgPath = file?.path;
+            const imgUrl = await sendImageToCloudinary(
+                imgName,
+                imgPath as string,
+            );
+            payload.profileImg = imgUrl;
+        }
 
         //create a student (transaction-2)
         const newStudent = await Student.create([payload], { session });
@@ -117,10 +122,15 @@ const createAdminIntoDB = async (
         payload.user = newUser[0]._id;
 
         // send image to cloudinary and add to url
-        const imgName = `${generatedId}${payload.name.firstName}`;
-        const imgPath = file?.path;
-        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
-        payload.profileImg = imgUrl;
+        if (file) {
+            const imgName = `${generatedId}${payload.name.firstName}`;
+            const imgPath = file?.path;
+            const imgUrl = await sendImageToCloudinary(
+                imgName,
+                imgPath as string,
+            );
+            payload.profileImg = imgUrl;
+        }
 
         const newAdmin = await Admin.create([payload], { session });
 
@@ -166,10 +176,15 @@ const createFacultyIntoDB = async (
         payload.user = newUser[0]._id;
 
         // send image to cloudinary and add to url
-        const imgName = `${generatedId}${payload.name.firstName}`;
-        const imgPath = file?.path;
-        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
-        payload.profileImg = imgUrl;
+        if (file) {
+            const imgName = `${generatedId}${payload.name.firstName}`;
+            const imgPath = file?.path;
+            const imgUrl = await sendImageToCloudinary(
+                imgName,
+                imgPath as string,
+            );
+            payload.profileImg = imgUrl;
+        }
 
         const newFaculty = await Faculty.create([payload], { session });
 

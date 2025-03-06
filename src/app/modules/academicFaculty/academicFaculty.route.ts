@@ -20,7 +20,7 @@ router.post(
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         academicFacultyValidations.updateAcademicFacultyValidationSchema,
     ),

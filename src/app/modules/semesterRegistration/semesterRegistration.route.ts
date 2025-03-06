@@ -11,7 +11,7 @@ router.get('/:id', SemesterRegistrationControllers.getSemesterRegistrationById);
 
 router.post(
     '/',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         SemesterRegistrationValidations.createSemesterRegistrationValidationSchema,
     ),
@@ -20,7 +20,7 @@ router.post(
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         SemesterRegistrationValidations.updateSemesterRegistrationValidationSchema,
     ),
@@ -29,7 +29,7 @@ router.patch(
 
 router.delete(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     SemesterRegistrationControllers.deleteSemesterRegistration,
 );
 

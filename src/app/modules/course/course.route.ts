@@ -11,32 +11,36 @@ router.get('/:id', CourseControllers.getCourseById);
 
 router.post(
     '/',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(CourseValidations.createCourseValidationSchema),
     CourseControllers.createCourse,
 );
 
 router.patch(
     '/:id',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(CourseValidations.updateCourseValidationSchema),
     CourseControllers.updateCourse,
 );
 
 router.put(
     '/:courseId/assign-faculties',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(CourseValidations.courseFacultyValidationSchema),
     CourseControllers.assignFacultiesWithCourse,
 );
 
 router.delete(
     '/:courseId/remove-faculties',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(CourseValidations.courseFacultyValidationSchema),
     CourseControllers.removeFacultiesFromCourse,
 );
 
-router.delete('/:id', auth('admin'), CourseControllers.deleteCourse);
+router.delete(
+    '/:id',
+    auth('admin', 'superAdmin'),
+    CourseControllers.deleteCourse,
+);
 
 export const CourseRouters = router;
