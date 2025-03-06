@@ -15,6 +15,7 @@ import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
 import { UserRole } from './user.constant';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 
 const createStudentIntoDB = async (
     password: string,
@@ -28,6 +29,15 @@ const createStudentIntoDB = async (
     if (!admissionSemester) {
         throw new AppError(status.NOT_FOUND, 'Admission Semester Not Found');
     }
+
+    const academicDepartment = await AcademicDepartment.findById(
+        payload.academicDepartment,
+    );
+    if (!academicDepartment) {
+        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+    }
+
+    payload.academicFaculty = academicDepartment.academicFaculty;
 
     // generate student id
     const generatedId: string = await generateStudentId(admissionSemester);

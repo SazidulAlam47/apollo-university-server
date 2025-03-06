@@ -7,7 +7,6 @@ import {
 } from './student.interface';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
-import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { userNameSchema } from '../user/user.model';
 
 const guardianSchema = new Schema<TGuardian>(
@@ -73,6 +72,11 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
             ref: 'AcademicDepartment',
             required: true,
         },
+        academicFaculty: {
+            type: Schema.Types.ObjectId,
+            ref: 'AcademicFaculty',
+            required: true,
+        },
         admissionSemester: {
             type: Schema.Types.ObjectId,
             ref: 'AcademicSemester',
@@ -131,13 +135,6 @@ studentSchema.pre('save', async function (next) {
     const existingId = await Student.findOne({ id: this.id });
     if (existingId) {
         throw new AppError(status.CONFLICT, 'Student already exists');
-    }
-
-    const academicDepartment = await AcademicDepartment.findById(
-        this.academicDepartment,
-    );
-    if (!academicDepartment) {
-        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
     }
 
     const existingEmail = await Student.findOne({ email: this.email });

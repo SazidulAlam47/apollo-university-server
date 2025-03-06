@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post(
     '/create-student',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     upload.single('file'),
     FromDataToJson,
     validateRequest(StudentValidations.createStudentValidationSchema),
@@ -22,7 +22,7 @@ router.post(
 
 router.post(
     '/create-faculty',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     upload.single('file'),
     FromDataToJson,
     validateRequest(FacultyValidations.createFacultyValidationSchema),
