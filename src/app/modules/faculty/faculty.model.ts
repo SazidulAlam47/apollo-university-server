@@ -3,7 +3,6 @@ import status from 'http-status';
 import { TFaculty } from './faculty.interface';
 import { userNameSchema } from '../user/user.model';
 import AppError from '../../errors/AppError';
-import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 
 const facultySchema = new Schema<TFaculty>(
     {
@@ -30,7 +29,16 @@ const facultySchema = new Schema<TFaculty>(
         presentAddress: { type: String, required: true },
         permanentAddress: { type: String, required: true },
         profileImg: { type: String, default: '' },
-        academicDepartment: { type: Schema.Types.ObjectId, require: true },
+        academicDepartment: {
+            type: Schema.Types.ObjectId,
+            require: true,
+            ref: 'AcademicDepartment',
+        },
+        academicFaculty: {
+            type: Schema.Types.ObjectId,
+            require: true,
+            ref: 'AcademicFaculty',
+        },
         isDeleted: {
             type: Boolean,
             default: false,
@@ -68,13 +76,6 @@ facultySchema.pre('save', async function (next) {
     const existingId = await Faculty.findOne({ id: this.id });
     if (existingId) {
         throw new AppError(status.CONFLICT, 'Faculty already exists');
-    }
-
-    const academicDepartment = await AcademicDepartment.findById(
-        this.academicDepartment,
-    );
-    if (!academicDepartment) {
-        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
     }
 
     const existingEmail = await Faculty.findOne({ email: this.email });

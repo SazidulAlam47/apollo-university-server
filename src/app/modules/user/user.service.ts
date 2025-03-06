@@ -162,6 +162,15 @@ const createFacultyIntoDB = async (
         role: 'faculty',
     };
 
+    const academicDepartment = await AcademicDepartment.findById(
+        payload.academicDepartment,
+    );
+    if (!academicDepartment) {
+        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+    }
+
+    payload.academicFaculty = academicDepartment.academicFaculty;
+
     const session = await mongoose.startSession();
 
     try {
