@@ -183,6 +183,11 @@ const removeFacultiesFromCourseFromDB = async (
     return result;
 };
 
+const getFacultiesOfCourseFromDB = async (id: string) => {
+    const result = await CourseFaculty.findById(id).populate('faculties');
+    return result;
+};
+
 export const CourseServices = {
     createCourseIntoDB,
     getAllCoursesFromDB,
@@ -191,4 +196,5 @@ export const CourseServices = {
     updateCourseIntoDB,
     assignFacultiesWithCourseIntoDB,
     removeFacultiesFromCourseFromDB,
+    getFacultiesOfCourseFromDB,
 };

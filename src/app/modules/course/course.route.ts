@@ -23,6 +23,12 @@ router.patch(
     CourseControllers.updateCourse,
 );
 
+router.get(
+    '/:courseId/get-faculties',
+    auth(),
+    CourseControllers.getFacultiesOfCourse,
+);
+
 router.put(
     '/:courseId/assign-faculties',
     auth('admin', 'superAdmin'),
