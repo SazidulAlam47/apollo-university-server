@@ -6,8 +6,19 @@ import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-router.get('/', OfferedCourseControllers.getAllOfferedCourse);
-router.get('/:id', OfferedCourseControllers.getOfferedCourseById);
+router.get(
+    '/',
+    auth('superAdmin', 'admin', 'faculty'),
+    OfferedCourseControllers.getAllOfferedCourse,
+);
+
+router.get(
+    '/my-offered-courses',
+    auth('student'),
+    OfferedCourseControllers.getMyOfferedCourses,
+);
+
+router.get('/:id', auth(), OfferedCourseControllers.getOfferedCourseById);
 
 router.post(
     '/',
