@@ -87,6 +87,7 @@ const createEnrolledCourseIntoDB = async (
     ]);
     const course = await Course.findById(offeredCourse.course, {
         credits: 1,
+        preRequisiteCourses: 1,
     });
     if (!course) {
         throw new AppError(status.NOT_FOUND, 'Course not found');
@@ -103,6 +104,20 @@ const createEnrolledCourseIntoDB = async (
         throw new AppError(status.BAD_REQUEST, 'Credit limit exceeded');
     }
 
+    for (const el of course.preRequisiteCourses) {
+        const isPreRequisiteCourseCompleted = await EnrolledCourse.findOne({
+            course: el.course,
+            student: student._id,
+            isCompleted: true,
+        });
+        if (!isPreRequisiteCourseCompleted) {
+            throw new AppError(
+                status.BAD_REQUEST,
+                'Pre-Requisite Courses are not completed',
+            );
+        }
+    }
+
     const payload: Partial<TEnrolledCourse> = {
         semesterRegistration: offeredCourse.semesterRegistration,
         academicSemester: offeredCourse.academicSemester,
@@ -110,7 +125,7 @@ const createEnrolledCourseIntoDB = async (
         academicDepartment: offeredCourse.academicDepartment,
         offeredCourse: new mongoose.Types.ObjectId(offeredCourseId),
         course: offeredCourse.course,
-        student: student?._id,
+        student: student._id,
         faculty: offeredCourse.faculty,
         isEnrolled: true,
     };
