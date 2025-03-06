@@ -20,4 +20,5 @@ export default {
     node_mailer_email: process.env.NODE_MAILER_EMAIL,
     node_mailer_user: process.env.NODE_MAILER_USER,
     node_mailer_password: process.env.NODE_MAILER_PASSWORD,
+    super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
 };

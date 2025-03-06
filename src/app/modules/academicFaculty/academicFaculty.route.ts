@@ -11,7 +11,7 @@ router.get('/:id', AcademicFacultyControllers.getAcademicFacultyById);
 
 router.post(
     '/',
-    auth('admin'),
+    auth('admin', 'superAdmin'),
     validateRequest(
         academicFacultyValidations.createAcademicFacultyValidationSchema,
     ),
