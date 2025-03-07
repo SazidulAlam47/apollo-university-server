@@ -212,7 +212,10 @@ const deleteOfferedCourseIntoDB = async (id: string) => {
     return result;
 };
 
-const getMyOfferedCoursesFromDB = async (id: string) => {
+const getMyOfferedCoursesFromDB = async (
+    id: string,
+    query: Record<string, unknown>,
+) => {
     const student = await Student.findOne({ id });
     if (!student) {
         throw new AppError(status.NOT_FOUND, 'Student not found');
@@ -226,7 +229,12 @@ const getMyOfferedCoursesFromDB = async (id: string) => {
         throw new AppError(status.NOT_FOUND, 'There is no Ongoing Semester');
     }
 
-    const result = await OfferedCourse.aggregate([
+    // pagination setup
+    const page: number = parseInt(query?.page as string) || 1;
+    const limit: number = parseInt(query?.limit as string) || 10;
+    const skip: number = (page - 1) * limit;
+
+    const mainAggregationQuery = [
         {
             $match: {
                 semesterRegistration: currentOngoingSemesterRegistration._id,
@@ -358,9 +366,34 @@ const getMyOfferedCoursesFromDB = async (id: string) => {
                 isPreRequisiteFulfilled: 0,
             },
         },
-    ]);
+    ];
 
-    return result;
+    const paginationQuery = [
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+    ];
+
+    const result = await OfferedCourse.aggregate([
+        ...mainAggregationQuery,
+        ...paginationQuery,
+    ]);
+    const total: number = (await OfferedCourse.aggregate(mainAggregationQuery))
+        .length;
+    const totalPage: number = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
 export const OfferedCourseServices = {

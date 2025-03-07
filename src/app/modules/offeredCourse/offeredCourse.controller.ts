@@ -65,7 +65,10 @@ const deleteOfferedCourse = catchAsync(async (req, res) => {
 
 const getMyOfferedCourses = catchAsync(async (req, res) => {
     const { id } = req.user;
-    const result = await OfferedCourseServices.getMyOfferedCoursesFromDB(id);
+    const result = await OfferedCourseServices.getMyOfferedCoursesFromDB(
+        id,
+        req.query,
+    );
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
