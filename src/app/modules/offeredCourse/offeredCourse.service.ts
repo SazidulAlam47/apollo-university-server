@@ -279,6 +279,42 @@ const getMyOfferedCoursesFromDB = async (id: string) => {
             },
         },
         {
+            $lookup: {
+                from: 'enrolledcourses',
+                let: {
+                    currentStudent: student._id,
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    {
+                                        $eq: ['$student', '$$currentStudent'],
+                                    },
+                                    {
+                                        $eq: ['$isCompleted', true],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                ],
+                as: 'completedCourses',
+            },
+        },
+        {
+            $addFields: {
+                completedCourseIds: {
+                    $map: {
+                        input: '$completedCourses',
+                        as: 'complete',
+                        in: '$$complete.course',
+                    },
+                },
+            },
+        },
+        {
             $addFields: {
                 isAlreadyEnrolled: {
                     $in: [
@@ -292,11 +328,34 @@ const getMyOfferedCoursesFromDB = async (id: string) => {
                         },
                     ],
                 },
+                isPreRequisiteFulfilled: {
+                    $or: [
+                        {
+                            $eq: ['$course.preRequisiteCourses', []],
+                        },
+                        {
+                            $setIsSubset: [
+                                '$course.preRequisiteCourses.course',
+                                '$completedCourseIds',
+                            ],
+                        },
+                    ],
+                },
             },
         },
         {
             $match: {
                 isAlreadyEnrolled: false,
+                isPreRequisiteFulfilled: true,
+            },
+        },
+        {
+            $project: {
+                enrolledCourses: 0,
+                completedCourses: 0,
+                completedCourseIds: 0,
+                isAlreadyEnrolled: 0,
+                isPreRequisiteFulfilled: 0,
             },
         },
     ]);
