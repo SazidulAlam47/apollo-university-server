@@ -10,7 +10,8 @@ const getAllFaculty = catchAsync(async (req, res) => {
         success: true,
         statusCode: status.OK,
         message: 'All Faculty fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 

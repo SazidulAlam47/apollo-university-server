@@ -22,8 +22,9 @@ const getAllAcademicSemesterFromDB = async (query: Record<string, unknown>) => {
         .fields();
 
     const result = await semesterQuery.modelQuery;
+    const meta = await semesterQuery.countTotal();
 
-    return result;
+    return { meta, result };
 };
 
 const getAcademicSemesterByIdFromDB = async (id: string) => {

@@ -25,7 +25,8 @@ const getAllAcademicSemester = catchAsync(async (req, res) => {
         statusCode: status.OK,
         success: true,
         message: 'All academic semesters fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 

@@ -32,7 +32,23 @@ const updateEnrolledCourseMarks = catchAsync(async (req, res) => {
     });
 });
 
+const getMyEnrolledCourse = catchAsync(async (req, res) => {
+    const { id } = req.user;
+    const result = await EnrolledCourseServices.getMyEnrolledCourseFromDB(
+        id,
+        req.query,
+    );
+    sendResponse(res, {
+        statusCode: status.CREATED,
+        success: true,
+        message: 'Enrolled Courses retrieved successfully',
+        meta: result.meta,
+        data: result.result,
+    });
+});
+
 export const EnrolledCourseControllers = {
     createEnrolledCourse,
     updateEnrolledCourseMarks,
+    getMyEnrolledCourse,
 };

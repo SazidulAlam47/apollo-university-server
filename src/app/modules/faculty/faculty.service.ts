@@ -8,7 +8,9 @@ import { TFaculty } from './faculty.interface';
 import { facultySearchableFields } from './faculty.constant';
 
 const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
-    const facultyPopulate = Faculty.find().populate('name');
+    const facultyPopulate = Faculty.find().populate(
+        'academicDepartment academicFaculty',
+    );
     const facultyQuery = new QueryBuilder(facultyPopulate, query)
         .search(facultySearchableFields)
         .filter()
@@ -17,7 +19,9 @@ const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
         .fields();
 
     const result = await facultyQuery.modelQuery;
-    return result;
+    const meta = await facultyQuery.countTotal();
+
+    return { meta, result };
 };
 
 const getFacultyByIdIntoDB = async (id: string) => {
