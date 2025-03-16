@@ -1,5 +1,5 @@
 {
-    "name": "module8",
+    "name": "apollo-university-server",
     "version": "1.0.0",
     "main": "scr/server.ts",
     "scripts": {
@@ -9,10 +9,6 @@
         "lint": "eslint src/ --fix",
         "format": "prettier --ignore-path .gitignore --write \"src/**/*.+(ts|json)\"  \"*.+(mjs|json)\""
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "description": "",
     "dependencies": {
         "bcrypt": "^5.1.1",
         "cloudinary": "^2.5.1",

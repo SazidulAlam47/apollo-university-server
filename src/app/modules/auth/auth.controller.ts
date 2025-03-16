@@ -12,7 +12,7 @@ const loginUser = catchAsync(async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
         secure: config.NODE_ENV === 'production',
         httpOnly: true,
-        sameSite: 'none', // frontend and backend in different domain
+        sameSite: config.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 365,
     });
 
@@ -24,6 +24,16 @@ const loginUser = catchAsync(async (req, res) => {
             accessToken,
             needsPasswordChange,
         },
+    });
+});
+
+const logoutUser = catchAsync(async (req, res) => {
+    res.clearCookie('refreshToken');
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: 'User logged out successfully',
+        data: null,
     });
 });
 
@@ -72,6 +82,7 @@ const resetPassword = catchAsync(async (req, res) => {
 
 export const AuthControllers = {
     loginUser,
+    logoutUser,
     changePassword,
     refreshToken,
     forgetPassword,

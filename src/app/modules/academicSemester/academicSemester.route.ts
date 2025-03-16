@@ -6,7 +6,11 @@ import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-router.get('/', AcademicSemesterControllers.getAllAcademicSemester);
+router.get(
+    '/',
+    auth('admin', 'superAdmin'),
+    AcademicSemesterControllers.getAllAcademicSemester,
+);
 router.get('/:id', AcademicSemesterControllers.getAcademicSemesterById);
 
 router.post(

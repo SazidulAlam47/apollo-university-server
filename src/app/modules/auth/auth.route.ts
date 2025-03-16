@@ -12,6 +12,8 @@ router.post(
     AuthControllers.loginUser,
 );
 
+router.get('/logout', AuthControllers.logoutUser);
+
 router.post(
     '/change-password',
     auth(),
