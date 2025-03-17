@@ -1,4 +1,4 @@
-# University Management Backend
+# Apollo University Backend
 
 This project is a backend service for managing university operations, written in TypeScript.
 
