@@ -15,9 +15,9 @@ export const sendImageToCloudinary = async (imgName: string, path: string) => {
 
     fs.unlink(path, (err) => {
         if (err) {
-            console.log(err);
+            console.error(`Error deleting file: ${err.message}`);
         } else {
-            console.log('File uploaded successfully');
+            console.log(`File '${path}' deleted successfully.`);
         }
     });
 

@@ -19,7 +19,7 @@ const loginUser = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: 'User is logged in successfully',
+        message: 'Logged in successfully',
         data: {
             accessToken,
             needsPasswordChange,
@@ -32,7 +32,7 @@ const logoutUser = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: 'User logged out successfully',
+        message: 'Logged out successfully',
         data: null,
     });
 });
