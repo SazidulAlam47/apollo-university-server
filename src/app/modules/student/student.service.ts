@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import { Student } from './student.model';
 import AppError from '../../errors/AppError';
@@ -6,6 +7,8 @@ import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { studentSearchableFields } from './student.constant';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     const populateStudents = Student.find().populate(
@@ -25,14 +28,9 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getStudentByIdFromDB = async (id: string) => {
-    const result = await Student.findById(id)
-        .populate('admissionSemester')
-        .populate({
-            path: 'academicDepartment',
-            populate: {
-                path: 'academicFaculty',
-            },
-        });
+    const result = await Student.findById(id).populate(
+        'admissionSemester academicDepartment academicFaculty',
+    );
     return result;
 };
 
@@ -65,8 +63,6 @@ const deleteUserFromDB = async (id: string) => {
         await session.endSession();
 
         return deletedStudent;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();
@@ -74,8 +70,30 @@ const deleteUserFromDB = async (id: string) => {
     }
 };
 
-const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
+const updateStudentIntoDB = async (
+    id: string,
+    payload: Partial<TStudent>,
+    file: any,
+) => {
     const { name, guardian, localGuardian, ...primitiveData } = payload;
+
+    const { academicDepartment } = payload;
+
+    const isAcademicDepartmentExists =
+        await AcademicDepartment.findById(academicDepartment);
+
+    if (!isAcademicDepartmentExists) {
+        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+    }
+
+    primitiveData.academicFaculty = isAcademicDepartmentExists.academicFaculty;
+
+    if (file) {
+        const imgName = `${payload.id}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        primitiveData.profileImg = imgUrl;
+    }
 
     const modifiedData: Record<string, unknown> = primitiveData;
     const nonPrimitiveData = { name, guardian, localGuardian };

@@ -3,6 +3,8 @@ import { StudentControllers } from './student.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { StudentValidations } from './student.validation';
 import auth from '../../middlewares/auth';
+import { upload } from '../../utils/sendImageToCloudinary';
+import FromDataToJson from '../../middlewares/FromDataToJson';
 
 const router = express.Router();
 
@@ -18,6 +20,8 @@ router.delete(
 router.patch(
     '/:id',
     auth('admin', 'superAdmin'),
+    upload.single('file'),
+    FromDataToJson,
     validateRequest(StudentValidations.updateStudentValidationSchema),
     StudentControllers.updateStudent,
 );

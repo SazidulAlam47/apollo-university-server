@@ -3,4 +3,5 @@ export const studentSearchableFields: Array<string> = [
     'name.lastName',
     'email',
     'presentAddress',
+    'id',
 ];

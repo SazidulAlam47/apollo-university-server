@@ -43,7 +43,11 @@ const deleteStudent = catchAsync(async (req, res) => {
 const updateStudent = catchAsync(async (req, res) => {
     const { id } = req.params;
     const { student } = req.body;
-    const result = await StudentServices.updateStudentIntoDB(id, student);
+    const result = await StudentServices.updateStudentIntoDB(
+        id,
+        student,
+        req.file,
+    );
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
