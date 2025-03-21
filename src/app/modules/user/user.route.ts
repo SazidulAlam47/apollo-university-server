@@ -40,7 +40,7 @@ router.post(
 
 router.get('/me', auth(), UserControllers.getMe);
 
-router.post(
+router.patch(
     '/change-status/:id',
     auth('admin', 'superAdmin'),
     validateRequest(UserValidations.changeStatusValidationSchema),

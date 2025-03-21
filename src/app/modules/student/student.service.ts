@@ -12,7 +12,7 @@ import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     const populateStudents = Student.find().populate(
-        'admissionSemester academicDepartment academicFaculty',
+        'admissionSemester academicDepartment academicFaculty user',
     );
     const studentQuery = new QueryBuilder(populateStudents, query)
         .search(studentSearchableFields)
@@ -29,7 +29,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
 const getStudentByIdFromDB = async (id: string) => {
     const result = await Student.findById(id).populate(
-        'admissionSemester academicDepartment academicFaculty',
+        'admissionSemester academicDepartment academicFaculty user',
     );
     return result;
 };
@@ -94,6 +94,8 @@ const updateStudentIntoDB = async (
         const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
         primitiveData.profileImg = imgUrl;
     }
+
+    delete primitiveData.email;
 
     const modifiedData: Record<string, unknown> = primitiveData;
     const nonPrimitiveData = { name, guardian, localGuardian };

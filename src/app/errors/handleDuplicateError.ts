@@ -18,7 +18,7 @@ const handleDuplicateError = (
 
     return {
         statusCode,
-        message: 'Duplicate Error',
+        message: `${match[2]} is already exits`,
         errorSources,
     };
 };
