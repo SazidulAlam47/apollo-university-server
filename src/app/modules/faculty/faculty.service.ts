@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import status from 'http-status';
 import { Faculty } from './faculty.model';
@@ -6,10 +7,12 @@ import { User } from '../user/user.model';
 import AppError from '../../errors/AppError';
 import { TFaculty } from './faculty.interface';
 import { facultySearchableFields } from './faculty.constant';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
     const facultyPopulate = Faculty.find().populate(
-        'academicDepartment academicFaculty',
+        'academicDepartment academicFaculty user',
     );
     const facultyQuery = new QueryBuilder(facultyPopulate, query)
         .search(facultySearchableFields)
@@ -25,12 +28,42 @@ const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getFacultyByIdIntoDB = async (id: string) => {
-    const result = await Faculty.findById(id);
+    const result = await Faculty.findById(id).populate(
+        'academicDepartment academicFaculty user',
+    );
     return result;
 };
 
-const updateFacultyByIdIntoDB = async (id: string, payload: TFaculty) => {
+const updateFacultyByIdIntoDB = async (
+    id: string,
+    payload: Partial<TFaculty>,
+    file: any,
+) => {
     const { name, ...primitiveData } = payload;
+
+    const { academicDepartment } = primitiveData;
+    if (academicDepartment) {
+        const isAcademicDepartmentExists =
+            await AcademicDepartment.findById(academicDepartment);
+
+        if (!isAcademicDepartmentExists) {
+            throw new AppError(
+                status.NOT_FOUND,
+                'Academic Department Not Found',
+            );
+        }
+        primitiveData.academicFaculty =
+            isAcademicDepartmentExists.academicFaculty;
+    }
+
+    if (file) {
+        const imgName = `${payload.id}-${new Date().getTime()}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        primitiveData.profileImg = imgUrl;
+    }
+
+    delete primitiveData.email;
 
     const modifiedData: Record<string, unknown> = primitiveData;
     const nonPrimitiveData = { name };
@@ -79,8 +112,6 @@ const deleteFacultyFromDB = async (id: string) => {
         await session.endSession();
 
         return deletedFaculty;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();

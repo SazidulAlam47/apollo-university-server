@@ -7,7 +7,12 @@ import AppError from '../../errors/AppError';
 const facultySchema = new Schema<TFaculty>(
     {
         id: { type: String },
-        user: { type: Schema.Types.ObjectId, require: true },
+        user: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            unique: true,
+            ref: 'User',
+        },
         designation: { type: String, require: true },
         name: { type: userNameSchema, require: true },
         gender: {
@@ -45,9 +50,18 @@ const facultySchema = new Schema<TFaculty>(
         },
     },
     {
+        toJSON: {
+            virtuals: true,
+        },
         timestamps: true,
     },
 );
+
+facultySchema.virtual('fullName').get(function () {
+    return this?.name
+        ? `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`
+        : undefined;
+});
 
 // Query Middleware,
 facultySchema.pre('find', function (next) {

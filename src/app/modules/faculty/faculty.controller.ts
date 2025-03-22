@@ -31,7 +31,11 @@ const getFacultyById = catchAsync(async (req, res) => {
 const updateFacultyById = catchAsync(async (req, res) => {
     const { id } = req.params;
     const { faculty } = req.body;
-    const result = await FacultyServices.updateFacultyByIdIntoDB(id, faculty);
+    const result = await FacultyServices.updateFacultyByIdIntoDB(
+        id,
+        faculty,
+        req.file,
+    );
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

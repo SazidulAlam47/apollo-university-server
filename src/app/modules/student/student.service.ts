@@ -9,6 +9,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { studentSearchableFields } from './student.constant';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     const populateStudents = Student.find().populate(
@@ -77,19 +78,36 @@ const updateStudentIntoDB = async (
 ) => {
     const { name, guardian, localGuardian, ...primitiveData } = payload;
 
-    const { academicDepartment } = payload;
+    const { academicDepartment, admissionSemester } = primitiveData;
 
-    const isAcademicDepartmentExists =
-        await AcademicDepartment.findById(academicDepartment);
+    if (academicDepartment) {
+        const isAcademicDepartmentExists =
+            await AcademicDepartment.findById(academicDepartment);
 
-    if (!isAcademicDepartmentExists) {
-        throw new AppError(status.NOT_FOUND, 'Academic Department Not Found');
+        if (!isAcademicDepartmentExists) {
+            throw new AppError(
+                status.NOT_FOUND,
+                'Academic Department Not Found',
+            );
+        }
+        primitiveData.academicFaculty =
+            isAcademicDepartmentExists.academicFaculty;
     }
 
-    primitiveData.academicFaculty = isAcademicDepartmentExists.academicFaculty;
+    if (admissionSemester) {
+        const isAdmissionSemesterExists =
+            await AcademicSemester.findById(admissionSemester);
+
+        if (!isAdmissionSemesterExists) {
+            throw new AppError(
+                status.NOT_FOUND,
+                'Admission Semester Not Found',
+            );
+        }
+    }
 
     if (file) {
-        const imgName = `${payload.id}`;
+        const imgName = `${payload.id}-${new Date().getTime()}`;
         const imgPath = file?.path;
         const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
         primitiveData.profileImg = imgUrl;

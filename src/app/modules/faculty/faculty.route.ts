@@ -4,6 +4,8 @@ import { FacultyValidations } from './faculty.validation';
 import validateRequest from '../../middlewares/validateRequest';
 import auth from '../../middlewares/auth';
 import { UserRole } from '../user/user.constant';
+import { upload } from '../../utils/sendImageToCloudinary';
+import FromDataToJson from '../../middlewares/FromDataToJson';
 
 const router = express.Router();
 
@@ -18,6 +20,8 @@ router.get('/:id', auth(), FacultyControllers.getFacultyById);
 router.patch(
     '/:id',
     auth('admin', 'faculty'),
+    upload.single('file'),
+    FromDataToJson,
     validateRequest(FacultyValidations.updateFacultyValidationSchema),
     FacultyControllers.updateFacultyById,
 );
