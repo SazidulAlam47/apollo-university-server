@@ -7,7 +7,7 @@ import status from 'http-status';
 const adminSchema = new Schema<TAdmin>(
     {
         id: { type: String },
-        user: { type: Schema.Types.ObjectId, require: true },
+        user: { type: Schema.Types.ObjectId, require: true, ref: 'User' },
         designation: { type: String, require: true },
         name: { type: userNameSchema, require: true },
         gender: {
@@ -35,9 +35,18 @@ const adminSchema = new Schema<TAdmin>(
         },
     },
     {
+        toJSON: {
+            virtuals: true,
+        },
         timestamps: true,
     },
 );
+
+adminSchema.virtual('fullName').get(function () {
+    return this?.name
+        ? `${this?.name?.firstName} ${this?.name?.middleName || ''} ${this?.name?.lastName}`
+        : undefined;
+});
 
 // Query Middleware,
 adminSchema.pre('find', function (next) {

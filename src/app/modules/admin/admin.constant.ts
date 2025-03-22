@@ -3,4 +3,5 @@ export const adminSearchableFields = [
     'name.lastName',
     'email',
     'presentAddress',
+    'id',
 ];

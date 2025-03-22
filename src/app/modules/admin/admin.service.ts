@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { adminSearchableFields } from './admin.constant';
@@ -6,9 +7,10 @@ import { Admin } from './admin.model';
 import AppError from '../../errors/AppError';
 import status from 'http-status';
 import { User } from '../user/user.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllAdminFromDB = async (query: Record<string, unknown>) => {
-    const adminPopulate = Admin.find().populate('name');
+    const adminPopulate = Admin.find().populate('name user');
     const adminQuery = new QueryBuilder(adminPopulate, query)
         .search(adminSearchableFields)
         .filter()
@@ -23,12 +25,25 @@ const getAllAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getAdminByIdIntoDB = async (id: string) => {
-    const result = await Admin.findById(id);
+    const result = await Admin.findById(id).populate('name user');
     return result;
 };
 
-const updateAdminByIdIntoDB = async (id: string, payload: TAdmin) => {
+const updateAdminByIdIntoDB = async (
+    id: string,
+    payload: Partial<TAdmin>,
+    file: any,
+) => {
     const { name, ...primitiveData } = payload;
+
+    if (file) {
+        const imgName = `${payload.id}-${new Date().getTime()}`;
+        const imgPath = file?.path;
+        const imgUrl = await sendImageToCloudinary(imgName, imgPath as string);
+        primitiveData.profileImg = imgUrl;
+    }
+
+    delete primitiveData?.email;
 
     const modifiedData: Record<string, unknown> = primitiveData;
     const nonPrimitiveData = { name };
@@ -77,8 +92,6 @@ const deleteAdminFromDB = async (id: string) => {
         await session.endSession();
 
         return deletedAdmin;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         await session.abortTransaction();
         await session.endSession();

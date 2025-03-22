@@ -31,7 +31,11 @@ const getAdminById = catchAsync(async (req, res) => {
 const updateAdminById = catchAsync(async (req, res) => {
     const { id } = req.params;
     const { admin } = req.body;
-    const result = await AdminServices.updateAdminByIdIntoDB(id, admin);
+    const result = await AdminServices.updateAdminByIdIntoDB(
+        id,
+        admin,
+        req.file,
+    );
     sendResponse(res, {
         statusCode: status.OK,
         success: true,

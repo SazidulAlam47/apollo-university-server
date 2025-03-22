@@ -31,7 +31,7 @@ router.post(
 
 router.post(
     '/create-admin',
-    auth('superAdmin'),
+    auth('superAdmin', 'admin'),
     upload.single('file'),
     FromDataToJson,
     validateRequest(AdminValidations.createAdminValidationSchema),
