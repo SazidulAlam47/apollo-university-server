@@ -126,8 +126,8 @@ const updateOfferedCourseIntoDB = async (
         await SemesterRegistration.findById(semesterRegistration);
     if (semesterRegistrationStatus?.status !== registrationStatus.Upcoming) {
         throw new AppError(
-            status.BAD_REQUEST,
-            `You can not update this Offered Course as it is ${semesterRegistrationStatus?.status}`,
+            status.NOT_ACCEPTABLE,
+            `You can not update this Offered Course as the Semester is ${semesterRegistrationStatus?.status}`,
         );
     }
 
