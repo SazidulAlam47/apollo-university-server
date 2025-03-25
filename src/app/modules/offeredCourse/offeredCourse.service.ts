@@ -135,6 +135,7 @@ const updateOfferedCourseIntoDB = async (
         semesterRegistration,
         faculty,
         days: { $in: days },
+        _id: { $ne: id },
     }).select('days startTime endTime');
 
     const newSchedule = {
@@ -157,13 +158,9 @@ const updateOfferedCourseIntoDB = async (
 };
 
 const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
-    const populateOfferedCourse = OfferedCourse.find()
-        .populate('semesterRegistration')
-        .populate('academicSemester')
-        .populate('academicFaculty')
-        .populate('academicDepartment')
-        .populate('course')
-        .populate('faculty');
+    const populateOfferedCourse = OfferedCourse.find().populate(
+        'semesterRegistration academicSemester academicFaculty academicDepartment course faculty',
+    );
 
     const OfferedCourseQuery = new QueryBuilder(populateOfferedCourse, query)
         .paginate()
@@ -172,18 +169,15 @@ const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
         .sort();
 
     const result = await OfferedCourseQuery.modelQuery;
+    const meta = await OfferedCourseQuery.countTotal();
 
-    return result;
+    return { result, meta };
 };
 
 const getOfferedCourseByIdFromDB = async (id: string) => {
-    const result = await OfferedCourse.findById(id)
-        .populate('semesterRegistration')
-        .populate('academicSemester')
-        .populate('academicFaculty')
-        .populate('academicDepartment')
-        .populate('course')
-        .populate('faculty');
+    const result = await OfferedCourse.findById(id).populate(
+        'semesterRegistration academicSemester academicFaculty academicDepartment course faculty',
+    );
 
     if (!result) {
         throw new AppError(status.NOT_FOUND, 'Offered Course not found');

@@ -91,7 +91,7 @@ const updateSemesterRegistrationIntoDB = async (
     // if the requested semester registered is ended, we will not update anything
     if (currentSemesterStatus === 'Ended') {
         throw new AppError(
-            status.BAD_REQUEST,
+            status.NOT_ACCEPTABLE,
             'Registered Semester is already Ended',
         );
     }
@@ -102,7 +102,7 @@ const updateSemesterRegistrationIntoDB = async (
         requestedSemesterStatus === 'Ended'
     ) {
         throw new AppError(
-            status.BAD_REQUEST,
+            status.NOT_ACCEPTABLE,
             'Directly Upcoming to Ended is not allowed',
         );
     }
@@ -122,7 +122,7 @@ const deleteSemesterRegistrationFromDB = async (id: string) => {
 
     if (deletedSemesterRegistration.status !== registrationStatus.Upcoming) {
         throw new AppError(
-            status.BAD_REQUEST,
+            status.NOT_ACCEPTABLE,
             `Semester Registration can not be deleted because it is ${deletedSemesterRegistration.status}`,
         );
     }
