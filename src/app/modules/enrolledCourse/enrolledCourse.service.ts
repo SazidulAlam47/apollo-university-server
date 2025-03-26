@@ -266,8 +266,32 @@ const getMyEnrolledCourseFromDB = async (
     return { meta, result };
 };
 
+const getFacultyCourseFromDB = async (
+    id: string,
+    query: Record<string, unknown>,
+) => {
+    const faculty = await Faculty.findOne({ id });
+
+    const enrolledCourseFind = EnrolledCourse.find({
+        faculty: faculty!._id,
+    }).populate(
+        'course student offeredCourse academicSemester semesterRegistration academicFaculty academicDepartment',
+    );
+
+    const enrolledCourseQuery = new QueryBuilder(
+        enrolledCourseFind,
+        query,
+    ).paginate();
+
+    const result = await enrolledCourseQuery.modelQuery;
+    const meta = await enrolledCourseQuery.countTotal();
+
+    return { meta, result };
+};
+
 export const EnrolledCourseServices = {
     createEnrolledCourseIntoDB,
     updateEnrolledCourseMarksIntoDB,
     getMyEnrolledCourseFromDB,
+    getFacultyCourseFromDB,
 };

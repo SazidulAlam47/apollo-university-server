@@ -12,6 +12,12 @@ router.get(
     EnrolledCourseControllers.getMyEnrolledCourse,
 );
 
+router.get(
+    '/faculty-enrolled-courses',
+    auth('faculty'),
+    EnrolledCourseControllers.getFacultyCourse,
+);
+
 router.post(
     '/',
     auth('student'),
