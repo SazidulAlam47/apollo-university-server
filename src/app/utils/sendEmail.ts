@@ -16,7 +16,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
         });
 
         await transporter.sendMail({
-            from: `"Ph University" <${config.node_mailer_email}>`,
+            from: `"Apollo University" <${config.node_mailer_email}>`,
             to,
             subject,
             html,

@@ -17,7 +17,7 @@ app.use(cors({ origin: [config.client_url as string], credentials: true }));
 app.use('/api/v1', router);
 
 const test = (req: Request, res: Response) => {
-    res.send('PH University Server is Running...');
+    res.send('Apollo University Server is Running...');
 };
 
 app.get('/', test);

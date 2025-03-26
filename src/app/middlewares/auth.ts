@@ -10,14 +10,14 @@ import { verifyToken } from '../modules/auth/auth.utils';
 const auth = (...requiredRoles: TUserRole[]) => {
     return catchAsync(
         async (req: Request, res: Response, next: NextFunction) => {
-            const authHeader = req.headers.authorization;
-            if (!authHeader) {
+            const tokenBearer = req.headers.authorization;
+            if (!tokenBearer) {
                 throw new AppError(
                     status.UNAUTHORIZED,
                     'You are not authorized',
                 );
             }
-            const token = authHeader.split(' ')[1]; // Extract token after "Bearer"
+            const token = tokenBearer.split(' ')[1]; // Extract token after "Bearer"
             if (!token) {
                 throw new AppError(
                     status.UNAUTHORIZED,

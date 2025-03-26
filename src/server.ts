@@ -15,7 +15,7 @@ async function main() {
 
         server = app.listen(config.port, () => {
             console.log(
-                `PH University Server is listening on port ${config.port}`,
+                `Apollo University Server is listening on port ${config.port}`,
             );
         });
     } catch (error) {

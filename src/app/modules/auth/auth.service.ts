@@ -160,7 +160,7 @@ const forgetPassword = async (id: string) => {
         '10m',
     );
 
-    const resetLink = `${config.client_url}?id=${user.id}&token=${resetToken}`;
+    const resetLink = `${config.client_url}/reset-password?id=${user.id}&token=${resetToken}`;
 
     const subject = 'Reset Password';
     const htmlBody = `
@@ -173,7 +173,7 @@ const forgetPassword = async (id: string) => {
             </div>
             <p>If you didn’t request this, you can safely ignore this email.</p>
             <p>Regards,</p>
-            <p><strong>PH University</strong></p>
+            <p><strong>Apollo University</strong></p>
         </div>
         `;
 
@@ -183,10 +183,14 @@ const forgetPassword = async (id: string) => {
 };
 
 const resetPassword = async (
-    token: string | undefined,
-    id: string,
+    tokenBearer: string | undefined,
+    id: string | undefined,
     password: string,
 ) => {
+    if (!id) {
+        throw new AppError(status.FORBIDDEN, 'Forbidden access');
+    }
+
     const user = await User.isUserExistsByCustomId(id);
 
     if (!user) {
@@ -199,8 +203,12 @@ const resetPassword = async (
         throw new AppError(status.FORBIDDEN, 'User is blocked');
     }
 
+    if (!tokenBearer) {
+        throw new AppError(status.FORBIDDEN, 'Forbidden access');
+    }
+    const token = tokenBearer.split(' ')[1]; // Extract token after "Bearer"
     if (!token) {
-        throw new AppError(status.UNAUTHORIZED, 'You are not authorized');
+        throw new AppError(status.FORBIDDEN, 'Forbidden access');
     }
     // check the token is valid
     const decoded = verifyToken(token, config.jwt_reset_secret as string);
