@@ -8,14 +8,20 @@ const router = express.Router();
 
 router.get(
     '/',
-    auth('superAdmin', 'admin', 'faculty'),
+    auth('superAdmin', 'admin'),
     OfferedCourseControllers.getAllOfferedCourse,
 );
 
 router.get(
-    '/my-offered-courses',
+    '/student-offered-courses',
     auth('student'),
     OfferedCourseControllers.getMyOfferedCourses,
+);
+
+router.get(
+    '/faculty-offered-courses',
+    auth('faculty'),
+    OfferedCourseControllers.getFacultyCourses,
 );
 
 router.get('/:id', auth(), OfferedCourseControllers.getOfferedCourseById);

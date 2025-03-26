@@ -391,6 +391,37 @@ const getMyOfferedCoursesFromDB = async (
     };
 };
 
+const getFacultyCoursesFromDB = async (
+    id: string,
+    query: Record<string, unknown>,
+) => {
+    const faculty = await Faculty.findOne({ id }, { _id: 1 });
+
+    const currentOngoingSemesterRegistration =
+        await SemesterRegistration.findOne(
+            {
+                status: registrationStatus.Ongoing,
+            },
+            { _id: 1 },
+        );
+
+    if (!currentOngoingSemesterRegistration) {
+        throw new AppError(status.NOT_FOUND, 'There is no Ongoing Semester');
+    }
+
+    const coursesFind = OfferedCourse.find({
+        faculty: faculty!._id,
+        semesterRegistration: currentOngoingSemesterRegistration._id,
+    }).populate('academicFaculty academicDepartment course');
+
+    const enrolledCourseQuery = new QueryBuilder(coursesFind, query).paginate();
+
+    const result = await enrolledCourseQuery.modelQuery;
+    const meta = await enrolledCourseQuery.countTotal();
+
+    return { meta, result };
+};
+
 export const OfferedCourseServices = {
     createOfferedCourseIntoDB,
     updateOfferedCourseIntoDB,
@@ -398,4 +429,5 @@ export const OfferedCourseServices = {
     getOfferedCourseByIdFromDB,
     deleteOfferedCourseIntoDB,
     getMyOfferedCoursesFromDB,
+    getFacultyCoursesFromDB,
 };

@@ -172,10 +172,6 @@ const updateEnrolledCourseMarksIntoDB = async (
 ) => {
     const faculty = await Faculty.findOne({ id }, { _id: 1 });
 
-    if (!faculty) {
-        throw new AppError(status.UNAUTHORIZED, 'Unauthorized access');
-    }
-
     const { semesterRegistration, offeredCourse, student, courseMarks } =
         payload;
 
@@ -202,7 +198,7 @@ const updateEnrolledCourseMarksIntoDB = async (
         semesterRegistration,
         offeredCourse,
         student,
-        faculty: faculty._id,
+        faculty: faculty!._id,
     });
 
     if (!isEnrolledCourseExists) {
@@ -255,10 +251,11 @@ const getMyEnrolledCourseFromDB = async (
         student: student._id,
     }).populate('course faculty offeredCourse');
 
-    const enrolledCourseQuery = new QueryBuilder(
-        enrolledCourseFind,
-        query,
-    ).paginate();
+    const enrolledCourseQuery = new QueryBuilder(enrolledCourseFind, query)
+        .paginate()
+        .filter()
+        .fields()
+        .sort();
 
     const result = await enrolledCourseQuery.modelQuery;
     const meta = await enrolledCourseQuery.countTotal();
@@ -274,14 +271,13 @@ const getFacultyCourseFromDB = async (
 
     const enrolledCourseFind = EnrolledCourse.find({
         faculty: faculty!._id,
-    }).populate(
-        'course student offeredCourse academicSemester semesterRegistration academicFaculty academicDepartment',
-    );
+    }).populate('student');
 
-    const enrolledCourseQuery = new QueryBuilder(
-        enrolledCourseFind,
-        query,
-    ).paginate();
+    const enrolledCourseQuery = new QueryBuilder(enrolledCourseFind, query)
+        .paginate()
+        .filter()
+        .fields()
+        .sort();
 
     const result = await enrolledCourseQuery.modelQuery;
     const meta = await enrolledCourseQuery.countTotal();
