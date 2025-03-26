@@ -253,7 +253,7 @@ const getMyEnrolledCourseFromDB = async (
     }
     const enrolledCourseFind = EnrolledCourse.find({
         student: student._id,
-    });
+    }).populate('course faculty offeredCourse');
 
     const enrolledCourseQuery = new QueryBuilder(
         enrolledCourseFind,

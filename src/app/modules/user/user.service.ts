@@ -214,16 +214,13 @@ const createFacultyIntoDB = async (
 const getMeFromDB = async (id: string, role: string) => {
     let result = null;
     if (role === UserRole.student) {
-        result = await Student.findOne({ id })
-            .populate('admissionSemester')
-            .populate({
-                path: 'academicDepartment',
-                populate: {
-                    path: 'academicFaculty',
-                },
-            });
+        result = await Student.findOne({ id }).populate(
+            'admissionSemester academicDepartment academicFaculty',
+        );
     } else if (role === UserRole.faculty) {
-        result = await Faculty.findOne({ id });
+        result = await Faculty.findOne({ id }).populate(
+            'academicDepartment academicFaculty',
+        );
     } else if (role === UserRole.admin) {
         result = await Admin.findOne({ id });
     }
