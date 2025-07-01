@@ -5,7 +5,7 @@ import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 const handleValidationError = (
     err: mongoose.Error.ValidationError,
 ): TGenericErrorResponse => {
-    const statusCode = status.BAD_REQUEST;
+    const statusCode = status.UNPROCESSABLE_ENTITY;
 
     const errorSources: TErrorSources = Object.values(err.errors).map(
         (value: mongoose.Error.ValidatorError | mongoose.Error.CastError) => ({
